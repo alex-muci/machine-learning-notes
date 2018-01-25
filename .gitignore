@@ -68,3 +68,4 @@ target/
 *.log
 *.out
 *.toc
+*.synctex.gz

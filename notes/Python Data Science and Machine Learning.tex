@@ -144,9 +144,9 @@
 
 \vspace{-.2in}
 \begin{abstract}
-\noindent These are review notes on data science and machine learning based on various sources. 
+\noindent These are review notes on data science and machine learning based on various sources for my own consumption. It helps me refresh things I read, but they cannot be a substitute for a good book or tutorial.
 
-\centering\textit{Do not use it: full of typos and unfinished.} 
+\centering\textit{Use it at your risk: still full of typos and unfinished.} 
 \end{abstract}
 
 \medskip
@@ -1037,7 +1037,7 @@ Complexity increases the fitting of the training data (reducing bias) but increa
 \subsection{Linear regression}
 Regression name comes from Francis Galton study on relationship between heights of fathers vs. sons: sons  tended to be as tall as father but height also tended to 'regress' towards the mean.  
 
-Coefficients (or betas) in the linear case are found by equalling to zero the derivative of SSE with respect to the beta ($\beta_1$ and $\beta_0$). For higher dimension you express everything in matrix terms ($X w = y$), multiplying first both sides by the transpose of X (because such product has a \textit{nice} inverse, i.e. always square and symmetric\footnote{This comes from equalling to zero the derivative of the error SSE: $e^T e$ written explicitly as in 1-dim case.}) and then solve:
+Coefficients (or betas) in the linear case are found by equalling to zero the derivative of SSE with respect to the beta ($\beta_1$ and $\beta_0$). For higher dimension you express everything in matrix terms ($X w = y$), multiplying first both sides by the transpose of X (because such product has a \textit{nice} inverse, i.e. always square and symmetric\footnote{This really comes from equalling to zero the derivative of the error SSE: $e^T e$ written explicitly as above in 1-dim case.}) and then solve:
 \[ w = (X^T X)^{-1} X^T y
 \]
 
@@ -1074,23 +1074,33 @@ lm.fit(X_train,y_train)
 
 # print interecept \& coefficients
 print(lm.intercept_)  # NB: name here and below
-coeff_df = pd.DataFrame(lm.coef_,index=X.columns, 
+coeff_df = pd.DataFrame(lm.coef_, index=X.columns, 
               columns=['Coefficient'])  # table
 coeff_df
 
 # predictions
 predictions = lm.predict(X_test)
+#expect a list, so for a single value: lm.predict[[22]]
 
-# evaluation
+# visual evaluation
 plt.scatter(y_test, predictions)
 sns.distplot((y_test-predictions),bins=50) # redisual plot
 
+# use performance metrics, like mse or r-square
 from sklearn import metrics
-print('MAE:', metrics.mean_absolute_error(y_test, predictions))
-print('MSE:', metrics.mean_squared_error(y_test, predictions))
-print('RMSE:', 
+print('MAE: ', metrics.mean_absolute_error(y_test, predictions))
+print('MSE: ', metrics.mean_squared_error(y_test, predictions))
+print('RMSE: ', 
 		np.sqrt(metrics.mean_squared_error(y_test, predictions)))
+
+# also r-square score (either from lm above or  metrics)
+print('r-square: ', lm.score(X_test, y_test))  # for testing set
+print('r-square: ', lm.score(X_train,y_train))
+# note arguments below
+print('r-square: ', metrics.r2_score(y_test, predictions))
 \end{lstlisting}
+
+There are several algorithms to minimise the sum of squared errors, e.g. (i)  ordinary least squares (OLS) or (ii) gradient descent.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1102,7 +1112,7 @@ ENTER MY NOTES HERE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Logistic regression \& Titanic dataset}
 Logistic regression is a \textbf{classification} method. For example binary classifications like spam vs. ham emails, loan default (yes/no), ... 
-vs. linear regression where prediction is a \textit{continuous} value. 
+vs. linear regression where prediction is a \textit{continuous} value (there is an implicit \textit{order} in the target value). 
 
 Logistic reg. is instead to predict discrete categories (for example two classes 0 and 1). We cannot use linear regression for binary data (see fig \ref{lin_log_regr})
 
@@ -1173,6 +1183,8 @@ Other \textit{evalutation metrics} are $F_{beta}$ (which is a generalisation of 
 	\label{ROC_curve}
 \end{figure}
 %         --------------------------------------
+
+Learning curves plots the prediction accuracy/error vs. the training set size (ie: how better does the model get at predicting the target as you the increase number of instances used to train it)
 
 And now the code:
 \begin{lstlisting}
@@ -1340,7 +1352,7 @@ You see that after, say, K$>$20 the error rate just tends to hover around, say, 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{KNN regression}
-It is a non-parametric regression, take average of y's ...
+Above we see the KNN classifier, here we look at the KNN regression - this is a non-parametric regression, take average of y's ...
 
 LOOK AT MY NOTES
 
@@ -1610,7 +1622,37 @@ To be completed
 Some interesting, but not directly related topics are reported here.
 
 
+\begin{lstlisting}
+from sklearn.metrics import make_scorer
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.model_selection import GridSearchCV
 
+def fit_model(X, y):
+   """ Performs grid search over the 'max_depth' parameter for a 
+   decision tree regressor trained on the input data [X, y]. """
+
+   # Create cross-validation sets from the training data
+   cv_sets = ShuffleSplit(n_splits = 10, test_size = 0.20, random_state = 0)
+
+   # Create a decision tree regressor object
+   regressor = DecisionTreeRegressor()
+
+   # Create a dictionary for the parameter 'max_depth' with a range from 1 to 10
+   params = {'max_depth':[i for i in range(1,11)]}
+
+   # Transform 'performance_metric' into a scoring function using 'make_scorer' 
+   scoring_fnc = make_scorer(performance_metric)
+
+   # Create the grid search cv object --> GridSearchCV()
+   # (estimator, param_grid, scoring, cv) 
+   grid = GridSearchCV(regressor, param_grid=params, scoring=scoring_fnc, cv=cv_sets)
+
+   # Fit the grid search object to the data to compute the optimal model
+   grid = grid.fit(X, y)
+
+   # Return the optimal model after fitting the data
+   return grid.best_estimator_
+\end{lstlisting}
 \clearpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Bibliography.

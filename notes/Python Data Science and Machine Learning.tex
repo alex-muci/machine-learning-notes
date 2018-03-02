@@ -774,7 +774,7 @@ sns.clustermap(pvflights,cmap='coolwarm',standard_scale=1)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Regression plots}
-There are many in-buil capabilities for regression, here we only show \textbf{lmplot()}
+There are many in-built capabilities for regression, here we only show \textbf{lmplot()}
 \begin{lstlisting}
 # chart with points and fitted regression (and stdev overlaid)
 # NB: can be an alternative to plt.scatter with 'fit_reg=False'
@@ -792,8 +792,13 @@ sns.lmplot(x="total_bill", y="tip", row="sex", col="time",data=tips)
 
 #  aspect and size
 sns.lmplot(x='total_bill',y='tip',data=tips,col='day',
-		hue='sex',palette='coolwarm',
+		hue='sex',palette='coolwarm', order=1
         aspect=0.6,size=8)
+        
+# NB: here x and y variables can be also pd.Series, np.arrays, besides str
+# hence no need of data=
+sns.regplot(x=advertising['TV'], y=advertising['Sales'], order=1,
+            scatter_kws={'color':'red'}, ci=None) 
 \end{lstlisting}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -973,11 +978,21 @@ It is used for: fraud detection (unsupervised), recognised someone in a picture 
 
 There are three main kinds of machine learning:
 \begin{itemize}
-	\item \textbf{Supervised} l \textbf{labeled} examples, i.earning: algorithms trained using inputs (also called features, independent variables, ...) with corresponding correct outputs (also called labels in classification, dependent variables, ...) that are used by the algo to learn by comparing forecasted vs. correct output to find errors and modify model accordingly. Commonly used for predictions; e.g. regression.
-	\item \textbf{Unsupervised} learning: system does not have correct outputs as example, aim is to \textbf{explore} data to find some structure within (segmenting the data); i.e. mainly clustering or dimensionality reduction.
-	\item \textbf{Reinforcement} learning: algorithm learns by trial and error which actions yields greatest rewards, mostly used in gaming, navigation or robotics.	Three main parts: agent (learner), environment (everything the agent interacts with) and actions (what the
-	agent can do).
+	\item \textbf{Supervised} learning: algorithms trained using inputs (also called features, independent variables, ...) with corresponding correct outputs (also called labels in classification, dependent variables, ...) that are used by the algo to learn by comparing forecasted vs. correct output to find errors and modify model accordingly. Commonly used for predictions; e.g. regression.
+	\item \textbf{Unsupervised} learning: system does not have correct outputs as examples, aim is to \textbf{explore} data to find some structure within (segmenting the data); i.e. mainly clustering (sometimes called 'unsupervised classification') or dimensionality reduction.
+	\item \textbf{Reinforcement} learning: algorithm learns by trial and error which actions yields greatest rewards - mostly used in gaming (e.g. chess engine), navigation or robotics. Three main parts: agent (learner), environment (everything the agent interacts with) and actions (what the	agent can do) - the agent tries to maximize the reward by a series of actions/interactions with the environment.
 \end{itemize}
+
+To recap, the main elements are:
+\begin{itemize}
+	\item supervised learning: (i) label data / targets, (ii) direct feedback, (iii) predict outcome;
+	\item unsupervised learning: (i) no labels, (ii) no feedback, (iii) find hidden structure in data;
+	\item reinforcement learning: (i) decision process, (ii) reward system, (iii) learn series of actions.
+\end{itemize}
+
+For supervised learning, you can further distinguish between (supervised) \textbf{classification} and \textbf{regression}, respectively, in terms of (i) output types (NB: output and not inputs): discrete (class labels) vs. continuous (numbers), (ii) result: decision boundary vs. best fit line and (iii) evaluation: accuracy (precision, recall, etc.) vs. mse (r-squared, etc.).
+
+Some (supervised) classification learning definitions: (i) instances (inputs / features): e.g. pictures, credit scores; (ii) concept: function that maps inputs and outputs; (iii) target concept: what we are trying to find (needs to be defined); (iv) hypothesis class: set of all concepts, of all possible functions (not regression like obviously); (v) sample (training set): set of all inputs paired with correct labels; (vi) candidate: concept that we think is the target concept (vii) testing set: inputs paired with correct labels on which to test the candidate. 
 
 Using Scikit Learn in Python, main steps (uniform interface across methods):
 \begin{lstlisting}
@@ -1000,7 +1015,7 @@ train_test_split(X, y, test_size=0.3)
 # in order not to throw away data we can also use
 # KFold cross-validation
 from sklearn.model_selection import KFold
-kf = KFold(size_data, size_testing_set,shuffle=True)
+kf = KFold(n_splits=3, shuffle=False, random_state=None)
 # read some more online ...
 
 # once created, model has to be fitted
@@ -1083,10 +1098,12 @@ predictions = lm.predict(X_test)
 #expect a list, so for a single value: lm.predict[[22]]
 
 # visual evaluation
-plt.scatter(y_test, predictions)
+plt.scatter(y_test, predictions)  # scatter between actual vs. expected
+# or
+plt.scatter(X, y); plt.plot(X, lm.predict(X), colour='blue', lw=3)
 sns.distplot((y_test-predictions),bins=50) # redisual plot
 
-# use performance metrics, like mse or r-square
+# use performance metrics (ike mse or r-square)
 from sklearn import metrics
 print('MAE: ', metrics.mean_absolute_error(y_test, predictions))
 print('MSE: ', metrics.mean_squared_error(y_test, predictions))
@@ -1100,7 +1117,9 @@ print('r-square: ', lm.score(X_train,y_train))
 print('r-square: ', metrics.r2_score(y_test, predictions))
 \end{lstlisting}
 
-There are several algorithms to minimise the sum of squared errors, e.g. (i)  ordinary least squares (OLS) or (ii) gradient descent.
+There are several algorithms to minimise the sum of squared errors, e.g. (i)  ordinary least squares (OLS) or (ii) gradient descent. 
+
+Why using the square vs. the absolute mean square error? Because there is only one solution for the former (by penalising more higher errors), whilst for the latter more lines can be optimal (think on how to distribute the absolute errors for a flattish line). In addition the former is much easier to implement (smooth derivatives).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1121,7 +1140,7 @@ Logistic reg. is instead to predict discrete categories (for example two classes
 \begin{figure}[htbp] 
 	\centering
 	\includegraphics[width=0.9\textwidth]{pics/logistic_regression}
-	\caption{Linear vs. Logistig regression} 
+	\caption{Linear vs. Logistic regression} 
 	\label{lin_log_regr}
 \end{figure}
 %         --------------------------------------
@@ -1135,9 +1154,10 @@ hence we can use Linear Regression solution $y=b_0+b_1 x$ and replace it into $z
 	\centering
 	\includegraphics[width=0.7\textwidth]{pics/sigmoid}
 	\caption{From linear to logistic}  
-	\label{lin_log_regr}
+	\label{sigmoid}
 \end{figure}
 %         --------------------------------------
+
 returning the \textbf{probability} (between 0 and 1) of belonging to a class: class 0 if prob below 0.5 and class 1 if above (see \ref{lin_log_regr}). 
 
 Use \textbf{confusion matrix} to evaluate the model (e.g. disease vs. test) and true positive/true of the Logistic (or any classification model)
@@ -1162,7 +1182,7 @@ Use Precision and Recall rather than Accuracy rate (see 'accuracy paradox\footno
 
 \begin{itemize}
 	\item \textbf{Type I error} = False positive. \\ E.g. In a spam model, clearly worse to have a false positive (i.e. sending to the spam folder a non-spam email) than just the inconvenience of deleting a spam email that makes it to your inbox (false negative). Hence, we want to max \textbf{Precision} (up to 1. - how many spam emails correctely identified out of all predicted spam ones);
-	\item \textbf{Type II error} = False negative \\ E.g. In a medical context, a false negative (sick people sent back home because diagnosed as healthy) is clearly worse than false positives (healthy individuals that have to do more tests). Hence we want to maximise \textbf{Recall} (how many diagnosied sick out of all sick people, e.g. precision 80\% but recall 95\%.).
+	\item \textbf{Type II error} = False negative \\ E.g. In a medical context, a false negative (sick people sent back home because diagnosed as healthy) is clearly worse than false positives (healthy individuals that have to do more tests). Hence we want to maximise \textbf{Recall} (how many diagnosed sick out of all sick people, e.g. precision 80\% but recall 95\%.).
 \end{itemize}
 
 Other \textit{evalutation metrics} are $F_{beta}$ (which is a generalisation of  $F1\_score$, see fig. \ref{F_beta_boundaries}) and Receiver Operating Characteristic ('ROC') curve (where the points are True Positive and True Negative Rate splitting, between (0, 0) and (1, 1))
@@ -1332,6 +1352,7 @@ from sklearn.metrics import classification_report,confusion_matrix
 print(confusion_matrix(y_test,pred))
 print(classification_report(y_test,pred))
 # from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+# print(accuracy_score(y_test, pred))
 
  # choose right K value
 error_rate = []
@@ -1368,17 +1389,61 @@ To recap:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Decision Trees and Random Forests}
+E.g. shall I enter this restaurant or not? possible instances/features: type of cuisine (Italian, French, ...), atmosphere (fancy, casual, ...), occupied, costs (discrete or number), hungry?, raining (would like to stop now), ... 
+
+Representation: what is a decision tree vs. algorithm (latter is how you implement such representation).
+
+Representation: a tree is made-up of
 \begin{itemize}
-	\item Nodes: split for the value of a certain attribute
-	\item Edges: outcome of a split to next node
+	\item Nodes: defined by the value of a certain \textit{attribute}, using questions for further splits or arrival point; 
+	\item Edges or branches: outcome of a split to the next node (represent \textit{values}, i.e. answers to the question in preceding node)
+\end{itemize}
+also nodes are of two kinds:
+\begin{itemize}
+	\item Decision nodes (that topmost called root node): node that performs splits (usually drawn as a circle, it has two or more branches);
+	\item Leaf notes: \textit{terminal} nodes that represent the outcome(s) (usually drawn as a boxe or just the end-result), they've got just one branch to a decision node or no branches (for the final ones).
 \end{itemize}
 
+The goal is to narrowing possibilities in getting the right class. Algorithm: pick best attributes and ask questions (e.g. best: halving possibilities), follow answer path and repeat (questions get more and more specific) until got an answer. 
+
+\textbf{Entropy} (that measures the homogeneity of a data set, from zero to the $log_2$ of different classes\footnote{E.g. for two classes: if all samples belong to one class then entropy is zero (no uncertainty), if data equally split between the two classes ($p_1 = p_2 = 0.5$) then entropy is 1 (the max for two classes). You can think of it as a parable with max of 1 at p=0.5 and minima of zero when p is either 0 or 1,}) and Information Gain (how well an attribute splits the data into groups based on classification: it measures the reduction in entropy that results from partitioning the data on an attribute) are the Mathematical Methods of choosing the best split (ref Ch 8 of Gareth et al):
+\[ Gain(S, A) = Entropy(S) - \sum_v \frac{|S_v|}{|S|} Entropy(S_v)
+\]
+where $S$ is the collection of training examples, $A$ is the attribute, $v$ is a particular class. And, finally, Entropy is $-\sum_v p(v) \,log_2[p(v)]$ (a measure of randomness or information). Recall that p(v) is the fraction of examples in class v. 
+
+In short, constructing a decision tree is all about finding attribute that returns the highest Information Gain (i.e., the most homogeneous branches). Note that in sklearn DecisionTreeClassifier the default criterion is the Gini index ('gini'), rather than the information gain ('entropy').  
+
+\textit{Expressiveness} (i.e. space of our hypothesis): n-or linear tree vs. n-xor\footnote{Difference: 'xor' is only true when either $x or $y is true, but not both (as instead for 'or'), i.e. is exclusive vs. inclusive.} (e.g. odd parity: true if odd no. of T) tree nodes are $o(2^n)$, very hard (being exponential fnct). 
+Suppose we have $n$ boolean attributes and output is boolean, how many trees (or rows in a truth table) are needed? rows are $2^n$ and trees are even more: $2^{2^n}$ (which is not $4^n$ and after just n=6 already explodes). 
+
+Example of algorithm (implementation): ID3 - a top-down, greedy search through the space of possible branches with no backtracking. ID3 uses Entropy and Information Gain to construct a decision tree:
 \begin{itemize}
-	\item Root: node that performs first split
-	\item Leaves: terminal nodes that predict the outcome
+	\item Calculate entropy of the target.
+	\item The dataset is then split on the different attributes. The entropy for each branch is calculated. Then it is added proportionally, to get total entropy for the split. The resulting entropy is subtracted from the entropy before the split, the result is the Information Gain or decrease in entropy. 
+	\item choose the attribute with the largest information gain as decision node; repeat for each new branch (if the entropy of the branch is zero 0 all yes or all no -  is a leaf node, continuous untill all leaf nodes, i.e. all classified.)
 \end{itemize}
 
-\textbf{Entropy} and Information Gain are the Mathematical Methods of choosing the best split (ref Ch 8 of Gareth et al)
+
+ID3 biases. Restriction bias (hypothesis: considering only decision trees, not an infinite number but a well defined set) and preference bias (what we prefer from the hypothesis set). Inductive bias -> algo preferences: good splits at top, correct over incorret, shorter tres.
+
+Other considerations for decision trees.
+\begin{itemize}
+	\item continuous attributes? what about for example 'age', we can use a range (e.g. a node with $20 \le age<30$ and since it is a continuous attribute we may ask again another question on it e.g. $age<20$).
+	\item when do we stop? when everything correctly classified, no more (discrete) attributes, no overfitting (noise always inside data: use cross-validation or expand the tree until error does not drop much or 'pruning', which is collapsing the leaves if error small enough).
+	\item regression: how to adapt a tree to continuous outputs. You need a different splitting criterion than information gain, e.g. variance, average of linear output.
+\end{itemize}
+
+
+A tree separates the space (decision boundaries), see \ref{tree_linear_separator}: two questions separates the space with two lines.
+%          --------   FIGURE: tree_linear_separator  -----------
+\begin{figure}[htbp] 
+	\centering
+	\includegraphics[width=0.6\textwidth]{pics/tree_linear_separator}
+	\caption{Tree separator} 
+	\label{tree_linear_separator}
+\end{figure}
+%         --------------------------------------
+
 
 To improve performance, we can use many trees with a random sample of features chosen as the split.
 \begin{itemize}
@@ -1422,9 +1487,147 @@ print(confusion_matrix(y_test,rfc_pred))  # for rdm forest
 # and same for classification_report
 \end{lstlisting}
 
+To reduce potential overfit, I can increase the min\_samples\_split (one param in DecisionTreeClassifier) from default of 2 (won't split samples lower than 2) to something bigger, e.g. 50.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Neural Network}
+
+\subsubsection*{Perceptron}
+Cartoonish view of human neurons.
+
+Perceptron (see fig. \ref{perceptron} for a graphic definition) always returns half-plane (e.g. immagine 2 inputs $X$ with equal weights $1/2$ and a threshold of $3/4$, then the perceptron divides the plan in two by the line passing for (0,3/2) and (3/2,0): 1 above and zero below) - i.e. linear threshold units.
+
+If the 'net-input' - which is a linear combinations of weights and inputs,  $w^T x$, also called 'activation' ??? - is above a threshold $\theta$ then the input belongs to one class, otherwise to the other (there are only two classes, a binary problem - NB: decision is a 'step function'). One can brings $theta$ on the left of the equation to simplify the problem ($w_0 = theta$, usually called the 'bias unit' - i.e. the new net-input is then compared to zero). In other words, the net input - $w^T x$ - is squashed into a binary output by the decision function, which is used to discriminate between two \textit{linearly-separable} classes.
+
+'And', 'or' or 'not' are all expressible as perceptron untis - but 'Xor' is not
+
+%          --------   FIGURE: percepton  -----------
+\begin{figure}[htbp] 
+	\centering
+	\includegraphics[width=0.7\textwidth]{pics/perceptron}
+	\caption{Perceptron} 
+	\label{perceptron}
+\end{figure}
+%         --------------------------------------
+Rosenblatt's perceptron rules:
+\begin{itemize}
+	\item initialise weights to zero or small random numbers (reasons below);
+	\item for each training sample/input: $x^{(i)}$:
+	\begin{itemize}
+		\item compute class output (using the step function)
+		\item update weights: $w_j = w_j +  \underbrace{ \eta \, (y^{(i)} - predicted^{(i)}) x_j^{(i)}}_{\Delta w_j}$.
+	\end{itemize}
+\end{itemize}
+where $\eta$ is the 'learning rate' in $(0., 1.]$.
+
+The convergence of the perceptron is only guaranteed if the two classes are linearly separable and the learning rate is sufficiently small. Otherwise, it will never stop to update the weights. 
+\begin{lstlisting}
+# relevant part of a class
+# X : {array-like}, shape = [n_samples, n_features]
+# y : array-like, shape = [n_samples], Target values.
+
+rgen = np.random.RandomState(self.random_state)
+self.w_ = rgen.normal(loc=0.0, scale=0.01,
+		   size = 1 + X.shape[1]) # 1 for 'bias unit'
+self.errors_ = []
+for _ in range(self.n_iter):  # limit iterations (e.g 50)
+	errors = 0
+	for xi, target in zip(X, y):	# loop through n_samples
+		# xi is a vector of n_features
+		net_input = np.dot(xi, self.w_[1:]) + self.w_[0]
+		predict=np.where(net_input>=0.0, 1, -1) # unit step
+		update = self.eta * (target - predict)
+		self.w_[1:] += update * xi
+		self.w_[0] += update
+		errors += int(update != 0.0)
+	self.errors_.append(errors)
+return self
+\end{lstlisting}
+If all the weights were initialized to zero, the learning rate parameter $\eta$ would only affect the scale of the weight vector, not the direction (i.e. angle between vectors, via dot product, would be zero: 0. = np.arccos( v1.dot(v2) / (np.linalg.norm(v1) * np.linalg.norm(v2)) ).
+
+\subsubsection*{Adaline}
+ADAptive LInear NEuron (\textbf{Adaline}), by Widrow and Hoff. The key difference vs. the perceptron is that the weights are updated using a linear activation function instread that by a unit step fnct. In short, instead of comparing the target (true class) with the predicted class, Adaline compares the true class with the linear activation fnct value (which is here the identity fnct of the net input: $\phi(w^T x) = w^T x$, i.e. a real number). The advantageis that the linear activation fnct is \textit{differentiable} and convex. We can therefore use an objective fnct, in case of Adaline a SSE between true class and prediction that can be minimised:
+\[ J(w) = \frac{1}{2} \sum_i (y^i - \phi(w^i \, x^i))
+\] 
+The term $1/2$ is used to make easier the gradient. We can update the weights by taking a step in the opposite direction of the gradient $\nabla J(w)$ multiplied by the learning rate, i.e. $\Delta w = -\eta \nabla J(w)$ (to compute the gradient we take the partial derivative of SSE with respect to each weight $w_j$):
+\[ 
+w_j = w_j +   \eta \, (y^{(i)} - \phi(w^i \, x^i)) x_j^{(i)}
+\]
+The rule seems identical, but $\phi$ is a real number and not an integer class, furthermore weights update is calculated on \textit{all} samples in the training set (instead than incrementally after each sample like in the perceptron), which is why this approach is called \textbf{batch gradient descent}.
+
+\begin{lstlisting}
+rgen = np.random.RandomState(self.random_state)
+self.w_ = rgen.normal(loc=0.0, scale=0.01,
+			size=1 + X.shape[1])
+self.cost_ = []
+for i in range(self.n_iter):
+	net_input = net_input(X)
+	output = activation(net_input)  # identity here
+	errors = (y - output)
+	self.w_[1:] += self.eta * X.T.dot(errors)  # gradient on all training set
+	self.w_[0] += self.eta * errors.sum()  
+	cost = (errors**2).sum() / 2.0
+	self.cost_.append(cost)
+return self
+
+def net_input(self, X):
+    return np.dot(X, self.w_[1:]) + self.w_[0]
+
+def activation(self, X):
+    return X
+
+def predict(self, X):
+    """Return class label after unit step"""
+    return np.where(activation(net_input(X)) >= 0.0, 1, -1)
+\end{lstlisting}
+We have to choose $\eta$ and $self.n_iter$ -our \textbf{hyperparameters}- to minimise the $self.cost$ above.
+
+Many learning algos, like gradient descent, benefits from features scaling: $x^{'}_j = 
+(x_j - \mu_j) / \sigma_j$
+\begin{lstlisting}
+X_std = np.copy(X)
+X_std[:,0] = (X[:,0] - X[:,0].mean()) / X[:,0].std()
+\end{lstlisting}
+
+A more computational efficient alternative to batch gradient descent (e.g. for millions of data points) is (online or) \textbf{stochatic gradient descent}, which is also useful for online learning.
+
+\subsubsection*{More}
+Neural network can represent booleans, continuous or arbitrary functions by just adding more \textbf{units} (more perceptrons, e.g. visually organised in a column) and (hidden) \textbf{layers} (number of columns) - so no restriction bias. To avoid overfit than limit numbers of units/layers and use cross-validation (same the trade-off bias vs. variance in other methods.)
+
+In other words, neural networks are a bunch of perceptrons added together in parallel to form one layer and multiplying such layers separated by non-linear elements.
+
+Backpropagation: get output given inputs by changing intermediate units and layers using gradient descent (one at the time).
+
+Preference bias: algorithm's selection of one representation over another. Occam's razor.
+
+Gradient descent: initial weights - generally small random values: random to avoid local minima by introducing variability, small for lower complexity because big weights may lead to overfitting)
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Support Vector Machines}
-Separate data using hyperplane (a line in 2-dim, a plane in 3-dim, ...)
+Separate data using hyperplane (a line in 2-dim, a plane in 3-dim, ...), intuitively the best line is the one least committed to the data (not too close to one of the classes in our training data: the one that maximises the distance between the classes).
+%          --------   FIGURE: SVM  -----------
+\begin{figure}[htbp] 
+	\centering
+	\includegraphics[width=1.\textwidth]{pics/SVM}
+	\caption{SVM} 
+	\label{SVM}
+\end{figure}
+%         --------------------------------------
+
+In order to maximise such distance, we can subtract the two boundaries from one another (see left-hand side fig. \ref{SVM}) and be left with $w^T (x1-x2) = 2$, then divide by the norm of $w$. Hence we need to maximise $2 /||w|| $ subject to $y_i (w^T x_i + b) \geq 1 ;\forall i$ (note that we multiply by $y_i$ to avoid writing two inequalities for $(\dots)$ $\leq -1$ and $\geq 1$ ). 
+An equivalent, but easier (quadratic: unique solution) problem is to minimise $1/2 \,||w||^2$ with same constraint - that we can transform into another quadratic problem with $alpha$ as new params (see right-hand side fig. \ref{SVM}). We can then recover $w$ as $w=\sum_i \alpha_i y_i x_i$ and since most of alphas are zero, one only needs a few of $x_i$ matter (you can see intuitively in a plane that the $x_i$ closer to the separating line matter).
+
+We can use the \textbf{kernel trick} (adding a further dimension) to separate classes linearly with an hyper-plan - see fig. \ref{kernel_trick} - the kernel is the transformation we are applying to the dot product ($x_i x_j$). Besides $k = (x^T y)^2$ in the fig, there are other many possible transformations like the gaussian $k(x,y)= \exp(-||x-y||^2 / (2 \sigma^2))$ or the sigmoid $\tanh(\alpha x^y y + \theta)$. A Kernel must satisfy the \underline{Mercer condition}, i.e. intuitively it must act as a distance. 
+
+%          --------   FIGURE: Kernel trick  -----------
+\begin{figure}[htbp] 
+	\centering
+	\includegraphics[width=.9\textwidth]{pics/kernel_trick}
+	\caption{Kernel trick (SVM)} 
+	\label{kernel_trick}
+\end{figure}
+%         --------------------------------------
+
 
 Coding example using a built-in dataset:
 \begin{lstlisting}
@@ -1439,7 +1642,7 @@ print(cancer['DESCR'])  # long description
  #set-up df of the features and target
 df_feat = pd.DataFrame(cancer['data'], 
 					columns=cancer['feature_names'])
-df_target = pd.DataFrame(cancer['target'],columns=['Cancer'])
+df_target = pd.DataFrame(cancer['target'], columns=['Cancer'])
 
 # 2. do some explanatory data analysis
 # e.g. sns.pairplot with hue = target

@@ -69,3 +69,7 @@ target/
 *.out
 *.toc
 *.synctex.gz
+
+private/
+Data/
+Chapter*

@@ -1,5 +1,5 @@
 % \documentclass[oneside,12pt]{report} % ,twoside,draft,openright] % report e' per la tesi
-\documentclass[12pt]{article}
+\documentclass[11pt]{article}
 
 \usepackage{setspace,graphicx,epstopdf,amsmath,amsfonts,amssymb,amsthm} %,versionPO}
 \usepackage{marginnote,datetime,enumitem,subfigure,rotating,fancyvrb}
@@ -978,8 +978,8 @@ It is used for: fraud detection (unsupervised), recognised someone in a picture 
 
 There are three main kinds of machine learning:
 \begin{itemize}
-	\item \textbf{Supervised} learning: algorithms trained using inputs (also called features, independent variables, ...) with corresponding correct outputs (also called labels in classification, dependent variables, ...) that are used by the algo to learn by comparing forecasted vs. correct output to find errors and modify model accordingly. Commonly used for predictions; e.g. regression.
-	\item \textbf{Unsupervised} learning: system does not have correct outputs as examples, aim is to \textbf{explore} data to find some structure within (segmenting the data); i.e. mainly clustering (sometimes called 'unsupervised classification') or dimensionality reduction.
+	\item \textbf{Supervised} learning: algorithms trained using inputs (also called features, attributes, independent variables, ...) with corresponding correct outputs (also called labels in classification, dependent variables, ...) that are used by the algo to learn by comparing forecasted vs. correct output to find errors and modify model accordingly. Commonly used for predictions; e.g. regression.
+	\item \textbf{Unsupervised} learning: system does not have correct outputs as examples, aim is to \textbf{explore} data to find some structure within (segmenting the data); i.e. mainly clustering (sometimes called 'unsupervised classification') or dimensionality reduction (e.g. K-means and PCA).
 	\item \textbf{Reinforcement} learning: algorithm learns by trial and error which actions yields greatest rewards - mostly used in gaming (e.g. chess engine), navigation or robotics. Three main parts: agent (learner), environment (everything the agent interacts with) and actions (what the	agent can do) - the agent tries to maximize the reward by a series of actions/interactions with the environment.
 \end{itemize}
 
@@ -1282,44 +1282,131 @@ To recap, the \textbf{evaluation metrics} are:
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Naive Bayes} \label{Naive_Bayes} 
+\subsection{Bayes Learning} \label{Bayes} 
+
+\subsubsection{Naive Bayes}
+The probabilistic model of naive Bayes classifiers is based on Bayes' theorem, and the adjective \textit{naive} comes from the fact that the algorithm considers the features (or attributes) that it is using to make the predictions to be mutually \textit{independent}, which may not always be the case (e.g. a naive Bayes spam filter considers the frequency, but not the order of the words). In practice, the independence assumption is often violated, but naive Bayes classifiers still tend to perform very well under this unrealistic assumption - especially for small sample sizes.
+
 One of the major advantages that Naive Bayes has over other classification algorithms is its ability to handle an extremely large number of features. For example, in a spam detector algorithm each word is treated as a feature and there are thousands of different words. Also, it performs well even with the presence of irrelevant features and is relatively unaffected by them. The other major advantage it has is its relative simplicity. Naive Bayes' works well right out of the box and tuning it's parameters is rarely ever necessary, except usually in cases where the distribution of the data is known. It rarely ever overfits the data. Another important advantage is that its model training and prediction times are very fast for the amount of data it can handle. 
 
-The term \textit{Naive} in Naive Bayes comes from the fact that the algorithm considers the features that it is using to make the predictions to be \textit{independent} of each other, which may not always be the case.
+Example, if $h = Cancer$ and $D (data) = \text{positive test}$:
+\[ \underbrace{P(Cancer|Pos)}_{\text{a posteriori}} = \frac{ P(Pos|Cancer) \; \overbrace{P(Cancer)}^{\text{a priori}} }{P(Pos)} 
+\]
+%          --------   Bayes:   -----------
+\begin{figure}[htbp] 
+	\centering
+	\includegraphics[width=0.9\textwidth]{pics/bayesian_learning}
+	\caption{Bayes learning} 
+	\label{bayesian_learning}
+\end{figure}
+%         --------------------------------------
+
 
 \begin{lstlisting}
-from sklearn.naive_bayes import MultinomialNB
-naive_bayes = MultinomialNB()
+from sklearn.naive_bayes import MultinomialNB, GaussianNB
+naive_bayes = MultinomialNB()  # GaussianNB
 naive_bayes.fit(training_data, y_train)
 predictions = naive_bayes.predict(testing_data)
 \end{lstlisting}
 
+
+Note that the final expression is the OLS in fig. \ref{bayesian_learning2} or perceptron: if Hp is linear and errors are i.i.d and Gaussians, we recover regression (e.g. $x_i$ are heights and $d_i$ the weights of people)
+
+%          --------   Bayesain Learning 2  -----------
+\begin{figure}[htbp] 
+	\centering
+	\includegraphics[width=0.9\textwidth]{pics/bayesian_learning_2}
+	\caption{Bayes learning 2} 
+	\label{bayesian_learning2}
+\end{figure}
+%         --------------------------------------
+
+Note that $lg$ in fig. \ref{bayesian_learning3} is the $log$ in base $2$ (number of bits). This is showing the link to entropy (error/wrong labels and size of hp): you want to find the simplest hypothesis that minimise the errors (usually the two terms are a trade-off: complicated hypothesis tend to reduce errros and vice-versa). This is called the "minimum description lenght". This justifies, somehow, the Occam's razor.
+%          --------   Bayesain Learning 3  -----------
+\begin{figure}[htbp] 
+	\centering
+	\includegraphics[width=0.9\textwidth]{pics/bayesian_learning_3}
+	\caption{Minimum description lenght} 
+	\label{bayesian_learning3}
+\end{figure}
+%         --------------------------------------
+
+Once we find $P(h|D)$ we really need to get a classification: see formula in fig \ref{bayesian_learning4} 
+%          --------   Bayesain Learning 4  -----------
+\begin{figure}[htbp] 
+	\centering
+	\includegraphics[width=0.9\textwidth]{pics/bayesian_learning_4}
+	\caption{Bayes classification} 
+	\label{bayesian_learning4}
+\end{figure}
+%         --------------------------------------
+
+\subsubsection{Belief Networks}
+Belief Networks (also called Bayes Nets or Bayesian Networks or Graphical Models) represent - graphically (via nodes and branches) - conditionally probabilities on events - and any joint probability comes from multiplying such conditional ones. If not independent, then it grows exponentially since you get more branches going into same event/node. Dependence does not mean causality (obviously). \textit{Topological} order (for sampling the joint distribution): it must be acyclic (you need to go from parent(s) to children).
+
+%          --------   Bayesain Learning 4  -----------
+\begin{figure}[htbp] 
+	\centering
+	\includegraphics[width=0.9\textwidth]{pics/belief_network1}
+	\caption{Sampling} 
+	\label{belief_network1}
+\end{figure}
+%         --------------------------------------
+Belief networks can be useful for approximate inference (simulate/generate some samples to infer 'reverse' conditional probability - easier to solve and faster), visualitation (get a fee), simulation of complex process. 
+
+%          --------   Bayesain Learning 5  -----------
+\begin{figure}[htbp] 
+	\centering
+	\includegraphics[width=0.9\textwidth]{pics/Bayesian_special_case}
+	\caption{Bayes SPAM (Bayes link to classification)} 
+	\label{Bayesian_special_case}
+\end{figure}
+%         --------------------------------------
+
+Why Naive Bayes is cool:
+\begin{itemize}
+	\item inference (in any direction) is cheap - linear rather than exponential (just using Bayes formula);
+	\item few parameters;
+	\item estimate parameters with labelled data: $Pr(attr_i | Class) = \frac{\# \, attr_{i,C}}{\# \, C}$ (one unseen attribute may spoil the whole classificztion, hence 'smooth' applied or the inductive bias);
+	\item connect inference and classification;
+	\item empirically succesful. Even if the model does not model interrelationships beetween atributes, it is still able to preserve the order (which in classification is what we care about).	 
+\end{itemize}
+
 \subsubsection{Bag of Words}
- Bag of Words(BoW) is a concept used to specify the problems that have a collection of text data that needs to be worked with. The basic idea of BoW is to take a piece of text and count the frequency of the words in that text. It is important to note that the BoW concept treats each word individually and the order in which the words occur does not matter.
+ Bag of Words(BoW) is a concept used to specify the problems that have a collection of text data that needs to be worked with. The basic idea of BoW is to take a piece of text and count the frequency of the words in that text. It is important to note that the BoW concept treats each word individually and the order in which the words occur does not matter (it is a 'naive' Bayes, indeed).
 
 From scratch:
 \begin{lstlisting}
 from import CountVectorize
-
+# TO BE COMPLETED
 \end{lstlisting}
 
 From scratch:
 \begin{lstlisting}
-
-naive_bayes = MultinomialNB()
-naive_bayes.fit(training_data, y_train)
-predictions = naive_bayes.predict(testing_data)
+#
+#	INSERT 
+#
 \end{lstlisting}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{K Nearest Neighbours} \label{K_Nearest_Neighbours} 
-KNN is a classification (non parametric) algorithm based on a simple principle, first one stores all the data (training) and then follows the steps below for the prediction:
+KNN is a (non parametric) classification (or regression, see below) algorithm based on a simple principle, first one stores all the data (training) and then follows the steps below for the prediction:
 \begin{itemize}
-	\item calculate distance from x to all points in your data,
-	\item sort the data by increasing distance from x,
-	\item predict majority label of the 'K' closest points.
+	\item calculate distance from $q$ to all points $x_i$ in your data,
+	\item sort the data by increasing distance from $q$ (or some other similarity: our domain knowledge),
+	\item predict $q$ using majority label of the 'K' closest pointss.
 \end{itemize}
-The choice of K will affect what class new point is assigned to (k=1 is very noisy, ...). Simple, but not good for large data sets and for categorical features.
+Example: think about cost label of a house (e.g. expensive, medium, cheap) vs. some nearby houses we know the price/labels of - how many houses ('K') are to be considered in a neighbourhood? say e.g. 5, calculate the distances, rank and get closest 5 houses, predict our unknown-label house using the majority label of such 5 closest houses.  
+
+The choice of K will clearly affect what class new point is assigned to (k=1 is very noisy, ...) as it does the choice of distance (e.g. Euclidean vs. L1-norm / Manhattan). Simple, but not good for large data sets and for categorical features.
+
+Preference bias of KNN (our belief of what makes a good Hp):
+\begin{itemize}
+	\item locality (near points are \underline{similar}: \textbf{distance}, e.g. Euclidean vs. L1),
+	\item smoothness (\textbf{averaging}),
+	\item all features matter \underline{equally} (think of using KNN regression on a function that was actually $y=x_1^2 + x_2$, clearly $x_1$ more important and KNN will not be that good).
+\end{itemize}
+
 Why standardise the variables: the KNN classifier predicts the class of a given test observation by identifying the observations that are nearest to it, therefore the scale of the variables matters (large scale variables will have a much larger effect on the distance and hence on the KNN classifier).
 \begin{lstlisting}
 # 1. read data
@@ -1371,14 +1458,19 @@ plt.ylabel('Error Rate')
 \end{lstlisting}
 You see that after, say, K$>$20 the error rate just tends to hover around, say, 0.06-0.05. Get confusion matrix and classification report with say K=20 and compare vs. those of K=1.
 
+Instance-based learning in general
+Advantage: (i) it does not forget data (e.g. in regression, we fit the model to the training data but we don't use it anymore), (ii) fast and (iii) simple. But: (i) no generalisation and (ii) overfit.
+
+\textit{Curse of dimensionality}: as the number of features or dimensions grows, the amount of data we need to generalise accurately grows \underline{exponentially}. E.g. 10 points in 1 dim, become 100 in 2-dim and 1000 in 3-dim... This is an issue for KNN only.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{KNN regression}
-Above we see the KNN classifier, here we look at the KNN regression - this is a non-parametric regression, take average of y's ...
+Above we saw the KNN classifier, here we look at the KNN regression (i.e. y's are numbers rather than labels) - this is a non-parametric regression, we predict y as the \textit{mean} of y's rather the more frequent label (i.e. regression: mean of $y_i$ in NN vs. classification: vote/plurality/majority of the $y_i$).
 
 LOOK AT MY NOTES
 
 \subsubsection{Kernel regression}
-Difference: here we weight the contribution of each x we have based on how far away from x at hand, whilst in KNN regression every x is essentially equally-weighted.
+Difference: here we weight the contribution of each $x_i$ we have based on how far away from $x$ at hand, whilst in KNN regression every $x$ is essentially equally-weighted. For example, we can replace the average with locally-weighted regression or even Neural Networks or other algorithms.
 
 %%%%%%%%
 To recap:
@@ -1386,6 +1478,15 @@ To recap:
 	\item parametric: if problem is biased, meaning that you have an idea of the relationship in terms of functional form, then use a parametric model/approach (e.g. how far a cannon is going to shoot, given the angle);
 	\item non-parametric: for un-biased problems, when you have no idea of the functional forms, then best to use a non-parametric approach (e.g. bees population as function of the food richness). More data-intensive since you have to store all data, but no need to guess the form of the solution.
 \end{itemize}
+
+
+In \textbf{eager} learners, e.g. Naive Bayes or regression, the computationally most expensive step is the model building (learning the model from a training dataset) whereas the classification of new instances is relatively fast (once model is learned).
+
+\textbf{Lazy} learners, like KNN, instead memorise and re-evaluate the training dataset for predicting the class label of new instances. Here is the model building step that is relatively fast, whilst the actual prediction is typically slower due to the re-evaluation of the training data. Another disadvantage of lazy learners is that the training data has to be retained, which can also be expensive in terms of storage space.
+
+Note that - assuming sorted data points - (i) in linear regression the learning runnig time is $n$ (filling matrix and inverting), whilst querying is constant (fast), (ii) instead for KNN is almost the reverse: learning speed is constant but query is $ln(n)$. 
+
+Every time a new instance is encountered, KNN would evaluate the k-nearest neighbours in order to decide upon a class label for the new instance, e.g., via the majority rule (i.e., the assignment of the class label that occurs most frequently amongst the k-nearest neighbors).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Decision Trees and Random Forests}
@@ -1424,7 +1525,7 @@ Example of algorithm (implementation): ID3 - a top-down, greedy search through t
 \end{itemize}
 
 
-ID3 biases. Restriction bias (hypothesis: considering only decision trees, not an infinite number but a well defined set) and preference bias (what we prefer from the hypothesis set). Inductive bias -> algo preferences: good splits at top, correct over incorret, shorter tres.
+ID3 biases. Restriction bias (hypothesis: considering only decision trees, not an infinite number but a well defined set) and preference bias (what we prefer from the hypothesis set vs. another). Inductive bias -> algo preferences: good splits at top, correct over incorret, shorter tres.
 
 Other considerations for decision trees.
 \begin{itemize}
@@ -1604,7 +1705,7 @@ Gradient descent: initial weights - generally small random values: random to avo
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Support Vector Machines}
-Separate data using hyperplane (a line in 2-dim, a plane in 3-dim, ...), intuitively the best line is the one least committed to the data (not too close to one of the classes in our training data: the one that maximises the distance between the classes).
+Separate data using hyperplane (a line in 2-dim, a plane in 3-dim, ...), intuitively the best line is the one least committed to the data (not too close to one of the classes in our training data), or in other words, the one that maximises the distance between the nearest points of the classes and the line/hyperplane, that distance is called \textbf{margin} in SVM (the idea is that of robustness: we use the training data, but we don't trust them too much - so we keep equidistant).
 %          --------   FIGURE: SVM  -----------
 \begin{figure}[htbp] 
 	\centering
@@ -1614,10 +1715,10 @@ Separate data using hyperplane (a line in 2-dim, a plane in 3-dim, ...), intuiti
 \end{figure}
 %         --------------------------------------
 
-In order to maximise such distance, we can subtract the two boundaries from one another (see left-hand side fig. \ref{SVM}) and be left with $w^T (x1-x2) = 2$, then divide by the norm of $w$. Hence we need to maximise $2 /||w|| $ subject to $y_i (w^T x_i + b) \geq 1 ;\forall i$ (note that we multiply by $y_i$ to avoid writing two inequalities for $(\dots)$ $\leq -1$ and $\geq 1$ ). 
-An equivalent, but easier (quadratic: unique solution) problem is to minimise $1/2 \,||w||^2$ with same constraint - that we can transform into another quadratic problem with $alpha$ as new params (see right-hand side fig. \ref{SVM}). We can then recover $w$ as $w=\sum_i \alpha_i y_i x_i$ and since most of alphas are zero, one only needs a few of $x_i$ matter (you can see intuitively in a plane that the $x_i$ closer to the separating line matter).
+In order to maximise such distance, we can subtract the two boundaries from one another (see left-hand side fig. \ref{SVM}) and be left with $w^T (x_1-x_2) = 2$, then divide by the norm of $w$. Hence we need to maximise $2 /||w|| $ subject to $y_i (w^T x_i + b) \geq 1 ;\forall i$ (note that we multiply by $y_i$ to avoid writing two inequalities for $(\dots)$ $\leq -1$ and $\geq 1$ ). 
+An equivalent, but easier (quadratic: unique solution) problem is to minimise $1/2 \,||w||^2$ with same constraints - that again can transform into another quadratic problem with $alpha$ as new param(s) (see right-hand side fig. \ref{SVM}). We can then recover $w$ simply as $w=\sum_i \alpha_i y_i x_i$ and since most of alphas are zero, one only needs a few of $x_i$ matter (you can see intuitively in a plane that the $x_i$ closer to the separating line matter).
 
-We can use the \textbf{kernel trick} (adding a further dimension) to separate classes linearly with an hyper-plan - see fig. \ref{kernel_trick} - the kernel is the transformation we are applying to the dot product ($x_i x_j$). Besides $k = (x^T y)^2$ in the fig, there are other many possible transformations like the gaussian $k(x,y)= \exp(-||x-y||^2 / (2 \sigma^2))$ or the sigmoid $\tanh(\alpha x^y y + \theta)$. A Kernel must satisfy the \underline{Mercer condition}, i.e. intuitively it must act as a distance. 
+We can use the \textbf{kernel trick} (adding one or further dimensions) to separate classes linearly with an hyper-plan - see fig. \ref{kernel_trick}, the kernel is the transformation we are applying to the dot product ($x_i x_j$) in fig \ref{kernel_trick}. Besides $k = (x^T y)^2$ in the fig (called '\textit{linear}'), there are many other possible transformations like the gaussian-looking '\textit{rbf}' $k(x,y)= \exp(-\gamma ||x-y||^2)$) or the \textit{sigmoid} $\tanh(\alpha x^y y + \theta)$. A Kernel must satisfy the \underline{Mercer condition}, i.e. intuitively it must act as a distance/inner product\footnote{The kernel trick avoids the \textit{explicit} mapping that is needed to get \textit{linear} learning algorithms to learn a \textit{nonlinear} function or decision boundary. For all x and y in the input space, certain functions $k(x,y)$ can be expressed as an inner product in another space - the $k$ map is called \textit{kernel} (the word 'kernel' is generally used in mathematics to denote a weighting function for a weighted sum or integral).}. 
 
 %          --------   FIGURE: Kernel trick  -----------
 \begin{figure}[htbp] 
@@ -1682,6 +1783,45 @@ grid_predictions = grid.predict(X_test)
 print(confusion_matrix(y_test,grid_predictions))
 print(classification_report(y_test,grid_predictions))
 \end{lstlisting}
+Besides the \textbf{Kernel} (linear, poly, rbf which is the default, sigmoid, or even a custom one), there are two more params: (i) \textbf{C}, the penalty parameter of the error term (it controls the tradoff between \textit{smooth} decision boundary and classifying training points \textit{correctly}: the lower the smoother the boundary, the higher the more correct) and (ii) \textbf{gamma} (coefficient for ‘rbf’, ‘poly’ and ‘sigmoid’ - hence no effect on the 'linear' kernel; it can be seen as the inverse of the radius of influence of samples selected by the model as support vectors; too large and it will overfit, too small and it will be too constrained).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ensemble}
+You get some simple rules and combine them to get a complex rule (learn over a subset of data that generates a rule, repeat, and combine all).
+
+%
+\subsubsection{Bagging}
+\textbf{Bagging or Bootstrapping aggregation}: combine simple rule(s) (e.g. 3rd order polynomial) on \textbf{random subsets} of the training data and average the result. 
+
+Bagging is the simplest ensemble learning we can think of: 
+\begin{itemize}
+	\item Simplest way to choose data: select uniformly randomly subsets.
+	\item Simplest combination: simple average.
+\end{itemize}
+
+Such an ensemble learning tends to perform \underline{better on the test/validation} datasets (lower variance) than more complex models (e.g. a 4rd order polynomial fitted on all training dat, which obviously fits better: lower bias).
+
+%
+\subsubsection{Boosting}
+Let's improve on Bagging by (i) focusing on the \textbf{'hardest'} examples and using (ii) \textbf{weighted} mean.0.5
+
+Introducing a new error defition (rather than simple mistmatch) as probability - given a distribution - that my Hp disagrees with the truth concept on some instances $x$ : $Pr_{distr}[Hp(x) \neq c(x)]$. 
+
+Concept of \textbf{weak learner}: no matter the distribution of the data, it gets lower errors than chance (e.g. <0.5): prob above is $ \ldots \leq 0.5 - \epsilon$.
+
+%          --------   FIGURE: Boosting  -----------
+\begin{figure}[htbp] 
+	\centering
+	\includegraphics[width=.9\textwidth]{pics/boosting_1}
+	\caption{Boosting algorithm} 
+	\label{boosting_1}
+\end{figure}
+%         --------------------------------------
+In fig. \ref{boosting_1}: note that if $y_i$ and $h_t(x_i)$ agrees (i.e. both $+1$ or $-1$), considering that $alpha$ is positive, the single $D_{t+1}(i)$ decreases (but the whole $D_{t+1}$ depends on other $x_i$). The final $H_{final}$ is a weighted function of the $h$ (if you divide by $sum_i \alpha_i$, that becomes a weighted average and answers remains the same): as we keep adding more and more learners, the error may not decrease much - but our confidence increases (more certain about harder example - we increase the margin), which helps avoiding overfitting. Boosting is agnoistic to the learner, as long as a 'weak' learner (better than 50%).
+
+Boosting may overfit if (i) the underlying learner overfits from the start (e.g. ANN with many layers) any looping does not make it better, (ii) 'pink noise' (uniform noise). 
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{K Means Clustering}
@@ -1856,7 +1996,19 @@ def fit_model(X, y):
    # Return the optimal model after fitting the data
    return grid.best_estimator_
 \end{lstlisting}
+
+
+%          --------   Bayesain quiz  -----------
+\begin{figure}[htbp] 
+	\centering
+	\includegraphics[width=0.9\textwidth]{pics/quiz_bayes}
+	\caption{Bayes quiz} 
+	\label{bayes_quiz}
+\end{figure}
+%         --------------------------------------
+
 \clearpage
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Bibliography.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

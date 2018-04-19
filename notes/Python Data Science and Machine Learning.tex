@@ -971,7 +971,7 @@ sns.clustermap(bank_stocks.xs(key='Close',axis=1,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%	MACHINE LEARNING
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Machine Learning} \label{sec:Machine}
+\section{Machine Learning: an intro} \label{sec:Machine}
 Machine learning is a method of data analysis that automates analytical model building, using algorithms that iteratively learn from data.
 
 It is used for: fraud detection (unsupervised), recognised someone in a picture give some of its previous pics (supervised), customer segmentation, credit scoring, image recognition, sentiment analysis, etc.
@@ -979,7 +979,7 @@ It is used for: fraud detection (unsupervised), recognised someone in a picture 
 There are three main kinds of machine learning:
 \begin{itemize}
 	\item \textbf{Supervised} learning: algorithms trained using inputs (also called features, attributes, independent variables, ...) with corresponding correct outputs (also called labels in classification, dependent variables, ...) that are used by the algo to learn by comparing forecasted vs. correct output to find errors and modify model accordingly. Commonly used for predictions; e.g. regression.
-	\item \textbf{Unsupervised} learning: system does not have correct outputs as examples, aim is to \textbf{explore} data to find some structure within (segmenting the data); i.e. mainly clustering (sometimes called 'unsupervised classification') or dimensionality reduction (e.g. K-means and PCA).
+	\item \textbf{Unsupervised} learning: system does not have correct outputs as examples, aim is to \textbf{explore} data to find some structure within (segmenting the data); i.e. mainly clustering (sometimes called 'unsupervised classification', e.g. K-Means or DBSCAN\footnote{Indeed: in classification you have a set of predefined classes and want to know which class a new object belongs to; whilst in Clustering you try to group a set of objects to find whether there is some relationship between.}) or dimensionality reduction (e.g. PCA).
 	\item \textbf{Reinforcement} learning: algorithm learns by trial and error which actions yields greatest rewards - mostly used in gaming (e.g. chess engine), navigation or robotics. Three main parts: agent (learner), environment (everything the agent interacts with) and actions (what the	agent can do) - the agent tries to maximize the reward by a series of actions/interactions with the environment.
 \end{itemize}
 
@@ -1049,6 +1049,160 @@ Trade-off between training error (bias) reduction and increase in testing error 
 Complexity increases the fitting of the training data (reducing bias) but increase errors on new data (higher variance or over-fitting). Combining the two effects we get a plot of the MSE that resembles a parable (min is the point at which extra complexity increases more variance than reduces bias: i.e. going from under-fitting to over-fitting).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Overview of different algorithms}
+
+\begin{itemize}
+	%
+	\item \textbf{Linear Regression}
+	\begin{itemize}
+		\item \textbf{strenghts}: linear regression is straightforward to understand and explain, and can be regularized to avoid overfitting. In addition, linear models can be updated easily with new data using stochastic gradient descent.
+		\item \textbf{weakenesses}: performs poorly when there are \textit{non-linear} relationships. They are not naturally flexible enough to capture more complex patterns (e.g. non-linear relationships), and adding the right interaction terms or polynomials can be tricky and time-consuming.
+	\end{itemize}
+	%
+	%
+	\item \textbf{Logistic Regression (classification)}
+	\begin{itemize}
+		\item \textbf{strenghts}:  nice probabilistic interpretation, and the algorithm can be regularized to avoid overfitting. Logistic models can be updated easily with new data using stochastic gradient descent.
+		\item \textbf{weakenesses}: underperform when there are \textit{multiple or non-linear} decision boundaries. They are not flexible enough to naturally capture more complex relationships.
+	\end{itemize}
+	%	
+	\item \textbf{Decision Trees (regression and classification)}
+	\begin{itemize}
+		\item \textbf{strenghts}: Able to handle categorical and numerical data. It can learn \textit{non-linear} relationships, and are fairly robust to outliers. Ensembles perform very well in practice, winning many classical (i.e. non-deep-learning) machine learning competitions. 
+		\item \textbf{weakenesses}: Unconstrained, individual trees are prone to \textit{overfitting} because they can keep branching until they memorize the training data. However, this can be alleviated by using ensembles (e.g. Random Forests).
+	\end{itemize}
+	%
+	\item \textbf{Nearest Neighbors}
+	\begin{itemize}
+		\item \textbf{strenghts}: easy to understand and it works well with a small number of features (low dimensionality).
+		\item \textbf{weakenesses}:  memory-intensive (since it is a lazy learner), perform poorly for \textit{high-dimensional data}, and require a meaningful distance function to calculate similarity. In practice, training regularized regression or tree ensembles are almost always better uses of your time.
+	\end{itemize}
+	%
+	\item \textbf{SVM (classification)}
+	\begin{itemize}
+		\item \textbf{strenghts}: can model \textit{non-linear} decision boundaries, and there are many kernels to choose from. They are also fairly\textit{ robust against overfitting} especially in high-dimensional space.
+		\item \textbf{weakenesses}:  memory intensive, trickier to tune due to the importance of picking the right kernel, and don't scale well to \textit{larger datasets}. Currently in the industry, random forests are usually preferred over SVM's.
+	\end{itemize}
+	%
+	\item \textbf{Naive Bayes (classification)}
+	\begin{itemize}
+		\item \textbf{strenghts}: although their conditional independence assumption rarely holds true, NB models actually perform surprisingly well in practice, especially for how simple they are. They are easy to implement, fast, scalable  (able to handle \textit{large number of features}), are robust to irrelevant features, rarely needs tuning and rarely prone to overfitting.
+		\item \textbf{weakenesses}:  due to their sheer simplicity, NB models are often beaten by models properly trained and tuned using the previous algorithms listed.
+	\end{itemize}
+	%
+	\item \textbf{K-Means (clustering)}
+	\begin{itemize}
+		\item \textbf{strenghts}: hands-down the most popular clustering algorithm because it's fast, simple, and surprisingly flexible if you pre-process your data and engineer useful features.
+		\item \textbf{weakenesses}:  must specify the number of clusters, which won't always be easy to do. In addition, if the true underlying clusters in your data are not globular (i.e. too uniformly distributed), then K-Means will produce poor clusters.
+	\end{itemize}
+	%
+	\item \textbf{DBSCAN (clustering)} \\
+	density based algorithm that makes clusters for \textit{dense} regions of points.
+	\begin{itemize}
+		\item \textbf{strenghts}: does not assume globular clusters, and its performance is scalable. In addition, it doesn't require every point to be assigned to a cluster, reducing the noise of the clusters (this may be a weakness, depending on your use case).
+		\item \textbf{weakenesses}:  must tune the hyperparameters $\epsilon$ and $min_samples$, which define the density of clusters. DBSCAN is quite sensitive to these hyperparameters.
+	\end{itemize}
+	%
+	\item \textbf{Deep Learning (regr. and classif.)}
+	\begin{itemize}
+		\item \textbf{strenghts}: state-of-the-art for certain domains, such as computer vision and speech recognition. Deep neural networks perform very well on image, audio, and text data, and they can be easily updated with new data using batch propagation. Their architectures (i.e. number and structure of layers) can be adapted to many types of problems, and their hidden layers \textit{reduce the need for feature engineering}.
+		\item \textbf{weakenesses}:  usually not suitable as general-purpose algorithms because they require a \textit{very large amount of data}. In fact, they are usually outperformed by tree ensembles for classical machine learning problems. In addition, they are computationally intensive to train, and they require much more expertise to tune (i.e. set the architecture and hyperparameters).
+	\end{itemize}
+\end{itemize}
+
+A couple of good links:
+\begin{itemize}
+	\item http://scikit-learn.org/stable/tutorial/machine\_learning\_map
+	\item http://sebastianraschka.com/faq/docs/best-ml-algo.html
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Preprocessing}
+Some preprocessing notes:
+
+\subsubsection*{Missing data}
+
+\subsubsection*{Skewed data}
+For highly-skewed feature distributions - e.g. features whose values tend to lie near a single number, but will also have a non-trivial number of vastly larger or smaller values than that single number - it is common practice to apply a  logarithmic transformation on the data so that very large and very small values do not negatively affect the performance of a learning algorithm. Using a logarithmic transformation significantly reduces the range of values caused by outliers (care must be taken since the logarithm of 0 is undefined, so we must translate the values by a small amount above 0 to apply the the logarithm successfully).
+\begin{lstlisting}
+features_log_transformed['some_skewed'] = \
+features_raw['some_skewed'].apply(lambda x: np.log(x + 1))
+\end{lstlisting}
+
+\subsubsection*{Normalisation}
+Applying a scaling to the data does not change the shape of features' distributions; however, normalization ensures that each feature is treated equally when applying supervised learners.
+
+\begin{lstlisting}
+from sklearn.preprocessing import MinMaxScaler
+
+scaler = MinMaxScaler() # default=(0, 1)
+numerical = ['age', 'capital-gain']
+
+# rename all dataframe
+features_log_minmax_transform = pd.DataFrame(data = features_log_transformed)
+
+# change what needs to be changed
+features_log_minmax_transform[numerical] = /
+scaler.fit_transform(features_log_transformed[numerical])
+\end{lstlisting}
+
+An often better choice is StandardScaler - TODO: explain why - see for example \ref{K_Nearest_Neighbours} or the following section on PCA. 
+
+\subsubsection*{Categorical data}
+Typically, learning algorithms expect inputs to be numeric, which requires that categorical variables to be converted. 
+
+One-hot encoding scheme creates a "dummy" variable for each possible category (see for example the use $pd.get\_dummies()$ in \ref{titanic}). 
+
+TODO: write about LabelEncoder  and OneHotEncoder in sklearn. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Feature extraction}
+An important task when performing supervised learning on a dataset like census data is determining which features provide the most predictive power.
+Choose a scikit-learn supervised learning algorithm that has a \text{feature\_importance\_} attribute available for it (for example ensemble: RandomForestCLassifier or Adaboost). This attribute is a function that ranks the importance of each feature when making predictions based on the chosen algorithm.
+
+\begin{lstlisting}
+from sklearn.ensemble import RandomForestClassifier
+
+model = RandomForestClassifier().fit(X_train, y_train)
+# Extract feature importances 
+importances = model.feature_importances_ 
+
+# plot
+feature_plot(importances, X_train, y_train)
+
+def feature_plot(importances, X_train, y_train):
+# Display the five most important features
+indices = np.argsort(importances)[::-1]
+columns = X_train.columns.values[indices[:5]]
+values = importances[indices][:5]
+
+# Creat the plot
+fig = pl.figure(figsize = (9,5))
+pl.title("Normalized Weights for First Five Most \
+Predictive Features", fontsize = 16)
+pl.bar(np.arange(5), values, width = 0.6, align="center", \ 
+color = '#00A000', 
+label = "Feature Weight")
+pl.bar(np.arange(5) - 0.3, np.cumsum(values), width = 0.2, \
+align = "center", color = '#00A0A0', \
+label = "Cumulative Feature Weight")
+pl.xticks(np.arange(5), columns)
+pl.xlim((-0.5, 4.5))
+pl.ylabel("Weight", fontsize = 12)
+pl.xlabel("Feature", fontsize = 12)
+
+pl.legend(loc = 'upper center')
+pl.tight_layout()
+pl.show()  
+\end{lstlisting}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%	Supervised learning
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Supervised Learning}
+
+
 \subsection{Linear regression}
 Regression name comes from Francis Galton study on relationship between heights of fathers vs. sons: sons  tended to be as tall as father but height also tended to 'regress' towards the mean.  
 
@@ -1123,13 +1277,13 @@ Why using the square vs. the absolute mean square error? Because there is only o
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Multiple linear regression, polynominal}
+\subsubsection{Multiple linear regression, polynominal} 
 ENTER MY NOTES HERE
 
 \textbf{Polynomial regression} is a form of regression analysis in which the relationship between the independent variable x and the dependent variable y is modelled as an nth degree polynomial in x: it  fits a nonlinear relationship between the value of x and the corresponding conditional mean of y, denoted E(y |x). Although a nonlinear model to the data, as a statistical estimation problem it is linear (i.e. the regression function E(y | x) is linear in the unknown parameters that are estimated from the data); hence polynomial regression is considered to be a special case of multiple linear regression.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Logistic regression \& Titanic dataset}
+\subsection{Logistic regression \& Titanic dataset} \label{titanic}
 Logistic regression is a \textbf{classification} method. For example binary classifications like spam vs. ham emails, loan default (yes/no), ... 
 vs. linear regression where prediction is a \textit{continuous} value (there is an implicit \textit{order} in the target value). 
 
@@ -1174,15 +1328,15 @@ This is a \textit{short} list of rates that are often computed from a confusion 
 \begin{itemize}
 	\item \textbf{Accuracy}: (TP+TN)/tot = (100+50) / 165) = 0.91
 	\item Error rate: (FP+FN)/tot = 1 - Accuracy
-	\item \textbf{Recall} (or Sensitivity or True Positive Rate): TP/(\textit{actual} yes) = 100 / 105 = 0.95
-	\item Specificity: TN/(actual no) = 50 / 60
-	\item \textbf{Precision} TP/(\textit{predicted} yes) = 100 / 110 = 0.91
+	\item \textbf{Recall} (or Sensitivity or True Positive Rate): TP/(\textit{actual} positive) = 100 / 105 = 0.95 (where 'actual positive' = TP + FN)
+	\item Specificity: TN/(actual negative) = 50 / 60
+	\item \textbf{Precision} TP/(\textit{predicted} positive) = 100 / 110 = 0.91 (where 'predicted positive' = TP + FP)
 \end{itemize}
 Use Precision and Recall rather than Accuracy rate (see 'accuracy paradox\footnote{For classification problems that are skewed in their classification distributions - e.g. if we had a 100 text messages and only 2 were spam and the rest 98 were not - accuracy by itself is not a very good metric. We could classify 90 messages as not spam (including the 2 that were actually spam, hence they would be false negatives) and 10 as spam (all 10 false positives) and still get a reasonably good accuracy score of 90\%. For such cases, precision and recall come in very handy. These two metrics can be combined to get the F1 score, which is weighted (harmonic) average of the precision and recall $F1\_score = 2 * \frac{prec * rec}{prec + rec}$} in wikipedia).
 
 \begin{itemize}
-	\item \textbf{Type I error} = False positive. \\ E.g. In a spam model, clearly worse to have a false positive (i.e. sending to the spam folder a non-spam email) than just the inconvenience of deleting a spam email that makes it to your inbox (false negative). Hence, we want to max \textbf{Precision} (up to 1. - how many spam emails correctely identified out of all predicted spam ones);
-	\item \textbf{Type II error} = False negative \\ E.g. In a medical context, a false negative (sick people sent back home because diagnosed as healthy) is clearly worse than false positives (healthy individuals that have to do more tests). Hence we want to maximise \textbf{Recall} (how many diagnosed sick out of all sick people, e.g. precision 80\% but recall 95\%.).
+	\item \textbf{Type I error} = False positive. \\ E.g. In a spam model, clearly worse to have a false positive (i.e. sending to the spam folder a non-spam email) than just the inconvenience of deleting a spam email that makes it to your inbox (false negative). Hence, we want to max \textbf{Precision} (up to 1. - how many spam emails correctly identified out of all \textit{predicted} spam ones);
+	\item \textbf{Type II error} = False negative \\ E.g. In a medical context, a false negative (sick people sent back home because diagnosed as healthy) is clearly worse than false positives (healthy individuals that have to do more tests). Hence we want to maximise \textbf{Recall} (how many diagnosed sick out of all \textit{actual} sick people, e.g. precision 80\% but recall 95\%.).
 \end{itemize}
 
 Other \textit{evalutation metrics} are $F_{beta}$ (which is a generalisation of  $F1\_score$, see fig. \ref{F_beta_boundaries}) and Receiver Operating Characteristic ('ROC') curve (where the points are True Positive and True Negative Rate splitting, between (0, 0) and (1, 1))
@@ -1773,6 +1927,7 @@ from sklearn.model_selection import GridSearchCV
 param_grid = {'C': [0.1,1, 10, 100, 1000], # is C not gamma? CHECK!!!
 	'gamma': [1,0.1,0.01,0.001,0.0001], 'kernel': ['rbf']}  
 grid = GridSearchCV(SVC(),param_grid,refit=True,verbose=3)	
+              , # scoring=make_scorer(fbeta_score, beta=0.5))
 # rbf: this is actually default, get verbose>0 to see some output
 grid.fit(X_train,y_train)  # May take awhile!
 grid.best_params_    # show best params
@@ -1785,9 +1940,10 @@ print(classification_report(y_test,grid_predictions))
 \end{lstlisting}
 Besides the \textbf{Kernel} (linear, poly, rbf which is the default, sigmoid, or even a custom one), there are two more params: (i) \textbf{C}, the penalty parameter of the error term (it controls the tradoff between \textit{smooth} decision boundary and classifying training points \textit{correctly}: the lower the smoother the boundary, the higher the more correct) and (ii) \textbf{gamma} (coefficient for ‘rbf’, ‘poly’ and ‘sigmoid’ - hence no effect on the 'linear' kernel; it can be seen as the inverse of the radius of influence of samples selected by the model as support vectors; too large and it will overfit, too small and it will be too constrained).
 
+NB: you can use \textit{StratifiedShuffleSplit}, rather than GridSearchCV, to ensure that training and validation sets have approximately the same number of data points of each output class, which is particularly useful with the imbalance in class labels.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Ensemble}
+\subsection{Ensembles}
 You get some simple rules and combine them to get a complex rule (learn over a subset of data that generates a rule, repeat, and combine all).
 
 %
@@ -1804,11 +1960,11 @@ Such an ensemble learning tends to perform \underline{better on the test/validat
 
 %
 \subsubsection{Boosting}
-Let's improve on Bagging by (i) focusing on the \textbf{'hardest'} examples and using (ii) \textbf{weighted} mean.0.5
+Let's improve on Bagging by (i) focusing on the \textbf{'hardest'} examples and using (ii) \textbf{weighted} mean.
 
-Introducing a new error defition (rather than simple mistmatch) as probability - given a distribution - that my Hp disagrees with the truth concept on some instances $x$ : $Pr_{distr}[Hp(x) \neq c(x)]$. 
+Introducing a new error definition (rather than simple mismatch) as probability - given a distribution - that my Hp disagrees with the truth concept on some instances $x$ : $Pr_{distr}[Hp(x) \neq c(x)]$. 
 
-Concept of \textbf{weak learner}: no matter the distribution of the data, it gets lower errors than chance (e.g. <0.5): prob above is $ \ldots \leq 0.5 - \epsilon$.
+Concept of \textbf{weak learner}: no matter the distribution of the data, it gets lower errors than chance (e.g. $<0.5$): prob above is $ \ldots \leq 0.5 - \epsilon$.
 
 %          --------   FIGURE: Boosting  -----------
 \begin{figure}[htbp] 
@@ -1822,17 +1978,36 @@ In fig. \ref{boosting_1}: note that if $y_i$ and $h_t(x_i)$ agrees (i.e. both $+
 
 Boosting may overfit if (i) the underlying learner overfits from the start (e.g. ANN with many layers) any looping does not make it better, (ii) 'pink noise' (uniform noise). 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{K Means Clustering}
+\section{Unsupervised learning}
+We will review a few clustering methods - starting from the simple one, than the most popular one, and finally one that solves some of the limitations of the latter (non globular data) - and a dimensionality reduction technique (PCA).
+
+Good properties of a clustering scheme are (i) richness (i.e. every partition should be possible), (ii) scale invariance (i.e. not sensitive to changes in the units of distance measurement) and (iii) consistency (i.e.by reducing distances within the clusters and enlarging between the clusters then we still have the same clustering).
+However, you cannot have all the three properties in a clustering algorithm since they are contradictory (Impossibility Theorem of Kleinberg). You can get two of those.
+ 
+\subsection{Single Linkage Clustering}
+Running time of SLC is $o(n^3)$for $n$ points and $K$ clusters (worst case is that $k$ is $1/2$ hence to look at all distances to find closest takes $o(n^2)$ to look at have different labels, we do this $n$ timesmn)
+
+%          --------   FIGURE: SLC.JPG  -----------
+\begin{figure}[htbp] 
+	\centering
+	\includegraphics[width=.9\textwidth]{pics/SLC}
+	\caption{Single Linkage Clustering} 
+	\label{SLC}
+\end{figure}
+%         --------------------------------------
+
+
+\subsubsection{K Means Clustering}
 K Means Clustering is an \textbf{unsupervised} learning algorithm that will attempt to group similar elements (PCA instead is a factor based rather than clustering algo). Used for market segmentation, cluster customers based on features, identify similar groups, ...
 
 The K Means Algorithm consists of the following steps:
 \begin{itemize}
 	\item choose a number of clusters “K” (more details later),
-	\item randomly assign each point to a cluster
-	\item until clusters stop changing, repeat the following loop: (i) for each cluster, compute the cluster centroid by taking the mean vector of points in the cluster and (ii) assign each data point to the cluster for which the centroid is the closest.
+	\item randomly assign each point to a cluster, and calculate for each a centroid (or just randomly drop K centroids)
+	\item until clusters stop changing, repeat the following loop: (i) for each cluster, compute the cluster centroid by taking the mean vector of points in the cluster and (ii) \textbf{assign} each data point to the cluster for which the centroid is the closest (minimising a distance).
 \end{itemize}
+
 %          --------   FIGURE: k_means_algo_loop  -----------
 \begin{figure}[htbp] 
 	\centering
@@ -1841,6 +2016,7 @@ The K Means Algorithm consists of the following steps:
 	% \label{k_means_algo}
 \end{figure}
 %         --------------------------------------
+For uniform distributed samples, the centroid initial conditions have a big effect on the final outcome (think of a square of point uniformly distributed and 2 centroids: depending on the latter initial position we may end up splitting the square vertically or horizontally or diagonally, and so). In Sklearn the parameter n\_init (default = 10) in KMeans() may allievate that issue for less degenerate cases (recall: KMeans is a hill-climbing algo, hence initial conditions may be important even for not degenerate case: local minimum - for example in 3 cluster case, two of the centroids start very close and are unable to move so in the end we find only two clusters or, another example, two centroids and the two clusters get divided horizontally across because of bad initial conditions).
 
 There is no easy answer on how to choose the best K. One way is the  elbow method:
 \begin{itemize}
@@ -1869,23 +2045,28 @@ plt.scatter(data[0][:,0],data[0][:,1],c=data[1],cmap='rainbow')
 
 
 # 3. K Means Clustering
- # create the cluster (NB: no train_test) 
+# create the cluster (NB: no train_test) 
 from sklearn.cluster import KMeans
 kmeans = KMeans(n_clusters=4) # choose the no. of clusters
 kmeans.fit(data[0])
 
- # output
+# output
 kmeans.cluster_centers_  # coordinates for K's
 kmeans.labels_  # the labels, see charts below
 
- # visual output: K mean vs. original (NB: only in our example 
- # since we've the labels - not possible since unsupervised)
+# visual output: K mean vs. original (NB: only in our example 
+# since we've the labels - not possible since unsupervised)
 f, (ax1, ax2) = plt.subplots(1, 2, sharey=True,figsize=(10,6))
 ax1.set_title('K Means')  # the chart with the label (NB: 'c=')
 ax1.scatter(data[0][:,0],data[0][:,1],c=kmeans.labels_,cmap='rainbow')
 ax2.set_title("Original")
 ax2.scatter(data[0][:,0],data[0][:,1],c=data[1],cmap='rainbow')
 \end{lstlisting}
+
+\subsection{DBSCAN}
+
+\subsection{Soft}
+E.g. Expectation Maximisation 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Principal Component Analysis}
@@ -1900,7 +2081,7 @@ It is difficult to visualize high dimensional data, we can use PCA to find the f
 from sklearn.datasets import load_breast_cancer
 cancer = load_breast_cancer()
 cancer.keys()  # dict_keys(['DESCR', 'data', 
-			   # 'feature_names', 'target_names', 'target'])
+# 'feature_names', 'target_names', 'target'])
 print(cancer['DESCR'])
 df = pd.DataFrame(cancer['data'],columns=cancer['feature_names'])
 
@@ -1937,21 +2118,22 @@ sns.heatmap(df_comp,cmap='plasma')
 
 Unfortunately, with this great power of dimensionality reduction, comes the cost of being able to easily understand what these components represent. The components correspond to combinations of the original features, the components themselves are stored as an attribute of the fitted PCA object.
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Recommender systems}
+\section{Recommender systems}
 To be completed
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Natural Language Processing (NLTK)}
+\section{Natural Language Processing (NLTK)}
 To be completed
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Big Data (Spark)}
+\section{Big Data (Spark)}
 To be completed
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Deep Learning (Tensorflow)}
+\section{Deep Learning (Tensorflow)}
 To be completed
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

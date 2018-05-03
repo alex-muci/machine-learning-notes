@@ -91,7 +91,7 @@
 	frame=l, % =l or = tb
 	tabsize=4, 
 	% Basic
-	basicstyle=\ttfamily\small\setstretch{1},
+	basicstyle=\ttfamily\footnotesize\setstretch{1},  % \ttfamily\small\setstretch{1},
 	backgroundcolor=\color{Background},
 	% Comments
 	commentstyle=\color{Comments}\slshape,
@@ -255,7 +255,7 @@ new_arr[my_arr > 4]  # same as above
 \subsubsection{Numpy operations}
 How to perform operations.
 \begin{lstlisting}
-arr_sum = arr_fist + arr_second  # sum element by element
+arr_sum = arr_first + arr_second  # sum element by element
                                  # similarly for '-', '*', '/'
 np.sqrt(arr); np.exp(arr); ... # standard math functions
 \end{lstlisting}
@@ -1055,14 +1055,14 @@ Complexity increases the fitting of the training data (reducing bias) but increa
 	%
 	\item \textbf{Linear Regression}
 	\begin{itemize}
-		\item \textbf{strenghts}: linear regression is straightforward to understand and explain, and can be regularized to avoid overfitting. In addition, linear models can be updated easily with new data using stochastic gradient descent.
+		\item \textbf{strenghts}: linear regression is straightforward to understand and explain, and can be regularised to avoid overfitting. In addition, linear models can be updated easily with new data using stochastic gradient descent.
 		\item \textbf{weakenesses}: performs poorly when there are \textit{non-linear} relationships. They are not naturally flexible enough to capture more complex patterns (e.g. non-linear relationships), and adding the right interaction terms or polynomials can be tricky and time-consuming.
 	\end{itemize}
 	%
 	%
 	\item \textbf{Logistic Regression (classification)}
 	\begin{itemize}
-		\item \textbf{strenghts}:  nice probabilistic interpretation, and the algorithm can be regularized to avoid overfitting. Logistic models can be updated easily with new data using stochastic gradient descent.
+		\item \textbf{strenghts}:  nice probabilistic interpretation, and the algorithm can be regularised to avoid overfitting. Logistic models can be updated easily with new data using stochastic gradient descent.
 		\item \textbf{weakenesses}: underperform when there are \textit{multiple or non-linear} decision boundaries. They are not flexible enough to naturally capture more complex relationships.
 	\end{itemize}
 	%	
@@ -1075,13 +1075,13 @@ Complexity increases the fitting of the training data (reducing bias) but increa
 	\item \textbf{Nearest Neighbors}
 	\begin{itemize}
 		\item \textbf{strenghts}: easy to understand and it works well with a small number of features (low dimensionality).
-		\item \textbf{weakenesses}:  memory-intensive (since it is a lazy learner), perform poorly for \textit{high-dimensional data}, and require a meaningful distance function to calculate similarity. In practice, training regularized regression or tree ensembles are almost always better uses of your time.
+		\item \textbf{weakenesses}:  memory-intensive (since it is a lazy learner), perform poorly for \textit{high-dimensional data}, and require a meaningful distance function to calculate similarity. In practice, training regularised regression or tree ensembles are almost always better uses of your time.
 	\end{itemize}
 	%
 	\item \textbf{SVM (classification)}
 	\begin{itemize}
-		\item \textbf{strenghts}: can model \textit{non-linear} decision boundaries, and there are many kernels to choose from. They are also fairly\textit{ robust against overfitting} especially in high-dimensional space.
-		\item \textbf{weakenesses}:  memory intensive, trickier to tune due to the importance of picking the right kernel, and don't scale well to \textit{larger datasets}. Currently in the industry, random forests are usually preferred over SVM's.
+		\item \textbf{strenghts}: best for linear decision boundaries, but it can also model \textit{non-linear} ones, and there are many kernels to choose from. They are also fairly\textit{ robust against overfitting} especially in high-dimensional space.
+		\item \textbf{weakenesses}:  memory intensive, trickier to tune due to the importance of picking the right kernel (especially for commingled classes), and don't scale well to \textit{larger datasets}. Currently in the industry, random forests are usually preferred over SVM's.
 	\end{itemize}
 	%
 	\item \textbf{Naive Bayes (classification)}
@@ -1096,11 +1096,17 @@ Complexity increases the fitting of the training data (reducing bias) but increa
 		\item \textbf{weakenesses}:  must specify the number of clusters, which won't always be easy to do. In addition, if the true underlying clusters in your data are not globular (i.e. too uniformly distributed), then K-Means will produce poor clusters.
 	\end{itemize}
 	%
+	\item \textbf{Gaussian Mixture Model (soft clustering)}
+	\begin{itemize}
+		\item \textbf{strenghts}: contrary to K-Means where every datapoint must belong to a cluster, GMM assigns a probability to a point belonging to a specific cluster and revising such probability at each iteration (a generalisation that incorporates the data covariance structure and centers of latent Gaussians). Fast and agnostic (maximizes only the likelihood, it will not bias the cluster sizes to have specific structures that might or might not apply).
+		\item \textbf{weakenesses}: need data to estimate covariances and it may diverge.
+	\end{itemize}
+	%	
 	\item \textbf{DBSCAN (clustering)} \\
 	density based algorithm that makes clusters for \textit{dense} regions of points.
 	\begin{itemize}
-		\item \textbf{strenghts}: does not assume globular clusters, and its performance is scalable. In addition, it doesn't require every point to be assigned to a cluster, reducing the noise of the clusters (this may be a weakness, depending on your use case).
-		\item \textbf{weakenesses}:  must tune the hyperparameters $\epsilon$ and $min_samples$, which define the density of clusters. DBSCAN is quite sensitive to these hyperparameters.
+		\item \textbf{strenghts}: does not assume globular clusters, and its performance is scalable. In addition, it does not require every point to be assigned to a cluster (a noise point), reducing the noise of the clusters (this may be a weakness, depending on your use case).
+		\item \textbf{weakenesses}:  must tune the hyperparameters $\epsilon$ and $min\_samples$, which define the density of clusters. DBSCAN is quite sensitive to these hyperparameters.
 	\end{itemize}
 	%
 	\item \textbf{Deep Learning (regr. and classif.)}
@@ -1122,19 +1128,49 @@ Some preprocessing notes:
 
 \subsubsection*{Missing data}
 
-\subsubsection*{Skewed data}
-For highly-skewed feature distributions - e.g. features whose values tend to lie near a single number, but will also have a non-trivial number of vastly larger or smaller values than that single number - it is common practice to apply a  logarithmic transformation on the data so that very large and very small values do not negatively affect the performance of a learning algorithm. Using a logarithmic transformation significantly reduces the range of values caused by outliers (care must be taken since the logarithm of 0 is undefined, so we must translate the values by a small amount above 0 to apply the the logarithm successfully).
+\subsubsection*{Skewed data transformation}
+For highly-skewed feature distributions - e.g. features whose values tend to lie near a single number, but will also have a non-trivial number of vastly larger or smaller values than that single number (i.e. not normally distributed, especially if the mean and median vary significantly indicating a large skew) - it is common practice to apply a  logarithmic transformation on the data so that very large and very small values do not negatively affect the performance of a learning algorithm. Using a logarithmic transformation significantly reduces the range of values caused by outliers (care must be taken since the logarithm of 0 is undefined, so we must translate the values by a small amount above 0 to apply the the logarithm successfully).
+
+Another way to achieve this scaling (besides simple approach of log transformation)  is by using a \href{https://scipy.github.io/devdocs/generated/scipy.stats.boxcox.html}{Box-Cox test}, which calculates the best power transformation of the data that reduces skewness 
 \begin{lstlisting}
 features_log_transformed['some_skewed'] = \
 features_raw['some_skewed'].apply(lambda x: np.log(x + 1))
+# or features_raw['some_skewed'].apply(np.log)
+\end{lstlisting}
+After applying a natural logarithm scaling to the data, the distribution of each feature should appear much \textit{more normal}.
+
+\subsubsection*{Detecting outliers}
+There are many "rules of thumb" for what constitutes an outlier in a dataset. An example is Tukey's Method: an outlier step is calculated as 1.5 times the interquartile range (IQR: = 3rd - 1st quartile). A data point with a feature that is beyond an outlier step outside of the IQR for that feature is considered abnormal (outlier either $< [1st quartile] - [1.5 * IQR]$ or $> [3rd quartile] + [1.5 * IQR]$).
+\begin{lstlisting}
+# For each feature find the data points with extreme high or low values
+for feature in log_data.keys():	
+	
+	#  Calculate Q1 and Q3 for the given feature
+	Q1 = np.percentile(log_data[feature], 25)
+	Q3 = np.percentile(log_data[feature], 75)
+
+	# Use the interquartile range to calculate
+	# an outlier step (1.5 times the interquartile range)
+	step = 1.5 * (Q3-Q1)
+
+	# Display the outliers
+	print("Outliers for the feature '{}':".format(feature))
+	display(log_data[~((log_data[feature] >= Q1 - step) 
+			& (log_data[feature] <= Q3 + step))])
+
+	# Select the indices for data points you wish to remove
+	outliers  = [65, 66]
+	# Remove the outliers
+	good_data = log_data.drop(log_data.index[[65, 66]]).reset_index(drop = True)
 \end{lstlisting}
 
-\subsubsection*{Normalisation}
-Applying a scaling to the data does not change the shape of features' distributions; however, normalization ensures that each feature is treated equally when applying supervised learners.
+\subsubsection*{Scaling}
+Applying a scaling to the data does not change the shape of features' distributions; however, normalization ensures that each feature is treated equally when applying supervised learners (otherwise some unbalanced feature may dominate the other in classification/prediction).
 
 \begin{lstlisting}
 from sklearn.preprocessing import MinMaxScaler
 
+# x_new = (x - x_min) / (x_max - x_min)
 scaler = MinMaxScaler() # default=(0, 1)
 numerical = ['age', 'capital-gain']
 
@@ -1146,17 +1182,67 @@ features_log_minmax_transform[numerical] = /
 scaler.fit_transform(features_log_transformed[numerical])
 \end{lstlisting}
 
-An often better choice is StandardScaler - TODO: explain why - see for example \ref{K_Nearest_Neighbours} or the following section on PCA. 
+An often better choice is StandardScaler (a normalisation of data: mean zero and variance of 1) - which is better because outliers will not mess up the scaling (in MinMaxScaler, indeed, too many of those may push many feature values too close to zero or one) - see for example \ref{K_Nearest_Neighbours} or the following section on PCA or SVM (but not necessary for linear regressions, each feature coefficient independent of the others, or decision trees, where features are split). 
+
+Transforming skewed data and scaling are part of \textbf{feature scaling}.
 
 \subsubsection*{Categorical data}
 Typically, learning algorithms expect inputs to be numeric, which requires that categorical variables to be converted. 
 
 One-hot encoding scheme creates a "dummy" variable for each possible category (see for example the use $pd.get\_dummies()$ in \ref{titanic}). 
 
-TODO: write about LabelEncoder  and OneHotEncoder in sklearn. 
+TODO: write about LabelEncoder (fictious order)  and OneHotEncoder (one vs. all) in sklearn. 
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Feature extraction}
+\subsection{Feature selection}
+Why selecting features is useful: (i) interpretability and insight, and (ii) curse of dimensionality (amount of data required grows exponentially with the number of features).
+
+Selecting the best sub-set of features is, obviuosly, an exponential(ly difficult) problem ($2^n$). There are, generally, two ways to do it:
+\begin{itemize}
+	\item \textbf{filtering}: criterion for selection is stand-alone (i.e. outside the learning algorithm and inside the searching algorithm: for example we can choose decision trees for selection - i.e. entropy - and pass the feature to another learner) - some feature selection tools are available in sklearn: (i) SelectKBest (keep $k$ feautures) or (ii) SelectPercentile (to select only, e.g., top 10\% of features) and a chosen criterion: see examples and more examples in \href{http://scikit-learn.org/stable/modules/feature_selection.html}{sklearn.feature\_selection};
+	\item \textbf{wrapping}: feature selection is based on the chosen learning algorithm itself (selection 'wrapped' around the algo, e.g. use neural networks as our model to select the best features and fit/prediction as well). 
+\end{itemize}
+
+The former is faster (ignoring the learning algorithm and using our own domain knowledge plus entropy/variance/ or similar), the latter is much slower but takes into account the learning algorithm bias (to avoid exponential cost of exhausting search: use hill climbing, randomised optimisation, or \textit{forward selection}\footnote{Use the best feature according to the learner, then add the second best feature that improves the learner score, and so on until the improvement levels off.} or backward selection (remove some features...)). A trade-off.
+
+TODO: 'Relevance' (strongly or weakly relevant, and irrelevant feature) measures effect on Bayes optimal classifier (a notion of information) vs. 'usefulness' measures effect on a particular model (min error of a learner).
+
+\textbf{Example} of feature relevance: \\
+{\small One interesting thought to consider is if one (or more) of the six product categories is actually \textbf{relevant for understanding} customer purchasing. That is to say, is it possible to determine whether customers purchasing some amount of one category of products will necessarily purchase some proportional amount of another category of products? We can make this determination quite easily by training a supervised regression learner on a subset of the data with one feature removed, and then score how well that model can predict the removed feature.}
+
+\begin{lstlisting}
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeRegressor
+
+features=['Fresh', 'Milk', 'Grocery', 'Frozen', 
+		  'Detergents_Paper', 'Delicatessen']
+
+for feature in features:        
+	new_data = data.drop(feature, axis=1) # inplace=False (default)
+	y_ = data[feature]
+
+	X_train, X_test, y_train, y_test = train_test_split(new_data, 
+	                       y_, test_size=0.25, random_state=101)
+
+	regressor = DecisionTreeRegressor(random_state=101)
+	regressor.fit(X_train, y_train)
+
+	score = regressor.score(X_test, y_test)  #   R^2
+	print("{} has score: {}" .format(feature, score))
+\end{lstlisting}
+{\small The coefficient of determination, $R^2$, is scored between 0 and 1, with 1 being a perfect fit. A negative $R^2$ implies the model fails to fit the data. If you get a low score for a particular feature, that lends us to beleive that that feature point is hard to predict using the other features, thereby making it an important feature to consider when considering relevance.}
+
+{\small Same information conveyed here in graphical terms: \\
+if feature relevant for identifying a specific customer, then the scatter matrix may not show any correlation between that feature and the others. Conversely, if feature not relevant then the scatter matrix might show a correlation between that feature and another feature in the data.}
+\begin{lstlisting}
+# Produce a scatter matrix for each pair of features in the data
+pd.plotting.scatter_matrix(data, alpha = 0.3, figsize = (14,8), diagonal = 'kde');
+# or, better, sns.pairplot(data)
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Feature extraction or transformation}
 An important task when performing supervised learning on a dataset like census data is determining which features provide the most predictive power.
 Choose a scikit-learn supervised learning algorithm that has a \text{feature\_importance\_} attribute available for it (for example ensemble: RandomForestCLassifier or Adaboost). This attribute is a function that ranks the importance of each feature when making predictions based on the chosen algorithm.
 
@@ -1171,31 +1257,31 @@ importances = model.feature_importances_
 feature_plot(importances, X_train, y_train)
 
 def feature_plot(importances, X_train, y_train):
-# Display the five most important features
-indices = np.argsort(importances)[::-1]
-columns = X_train.columns.values[indices[:5]]
-values = importances[indices][:5]
+	# Display the five most important features
+	indices = np.argsort(importances)[::-1]
+	columns = X_train.columns.values[indices[:5]]
+	values = importances[indices][:5]
 
-# Creat the plot
-fig = pl.figure(figsize = (9,5))
-pl.title("Normalized Weights for First Five Most \
-Predictive Features", fontsize = 16)
-pl.bar(np.arange(5), values, width = 0.6, align="center", \ 
-color = '#00A000', 
-label = "Feature Weight")
-pl.bar(np.arange(5) - 0.3, np.cumsum(values), width = 0.2, \
-align = "center", color = '#00A0A0', \
-label = "Cumulative Feature Weight")
-pl.xticks(np.arange(5), columns)
-pl.xlim((-0.5, 4.5))
-pl.ylabel("Weight", fontsize = 12)
-pl.xlabel("Feature", fontsize = 12)
+	# Creat the plot
+	fig = pl.figure(figsize = (9,5))
+	pl.title("Normalized Weights for First Five Most \
+			Predictive Features", fontsize = 16)
+	pl.bar(np.arange(5), values, width = 0.6, align="center", \ 
+		color = '#00A000', label = "Feature Weight")
+	pl.bar(np.arange(5) - 0.3, np.cumsum(values), width = 0.2, \
+		align = "center", color = '#00A0A0', \p
+		label = "Cumulative Feature Weight")
+	pl.xticks(np.arange(5), columns)
+	pl.xlim((-0.5, 4.5))
+	pl.ylabel("Weight", fontsize = 12)
+	pl.xlabel("Feature", fontsize = 12)
 
-pl.legend(loc = 'upper center')
-pl.tight_layout()
-pl.show()  
+	pl.legend(loc = 'upper center')
+	pl.tight_layout()
+	pl.show()  
 \end{lstlisting}
 
+Similar to feature selection, we can use different feature extraction / transformation techniques to reduce the number of features in a dataset (e.g. PCA, ICA, RCA, or linear combinations). The difference between feature selection and feature extraction / transformation is that while we maintain the original features  with the first (e.g. when using 'sequential backward selection'), for the latter we transform or project the data onto a new feature space. In the context of dimensionality reduction, feature extraction is an approach to data compression with the goal of maintaining most of the relevant information whilst improving storage space or the computational efficiency of the learning algorithm, but also improve the predictive performance by reducing the curse of dimensionality (for example PCA is a general algo for feature extraction or transformation).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%	Supervised learning
@@ -1449,7 +1535,7 @@ Example, if $h = Cancer$ and $D (data) = \text{positive test}$:
 %          --------   Bayes:   -----------
 \begin{figure}[htbp] 
 	\centering
-	\includegraphics[width=0.9\textwidth]{pics/bayesian_learning}
+	\includegraphics[width=0.7\textwidth]{pics/bayesian_learning}
 	\caption{Bayes learning} 
 	\label{bayesian_learning}
 \end{figure}
@@ -1469,7 +1555,7 @@ Note that the final expression is the OLS in fig. \ref{bayesian_learning2} or pe
 %          --------   Bayesain Learning 2  -----------
 \begin{figure}[htbp] 
 	\centering
-	\includegraphics[width=0.9\textwidth]{pics/bayesian_learning_2}
+	\includegraphics[width=0.7\textwidth]{pics/bayesian_learning_2}
 	\caption{Bayes learning 2} 
 	\label{bayesian_learning2}
 \end{figure}
@@ -1479,17 +1565,17 @@ Note that $lg$ in fig. \ref{bayesian_learning3} is the $log$ in base $2$ (number
 %          --------   Bayesain Learning 3  -----------
 \begin{figure}[htbp] 
 	\centering
-	\includegraphics[width=0.9\textwidth]{pics/bayesian_learning_3}
+	\includegraphics[width=0.7\textwidth]{pics/bayesian_learning_3}
 	\caption{Minimum description lenght} 
 	\label{bayesian_learning3}
 \end{figure}
 %         --------------------------------------
 
-Once we find $P(h|D)$ we really need to get a classification: see formula in fig \ref{bayesian_learning4} 
+Once we find $P(h|D)$ we really need to get a classification: see formula in fig. \ref{bayesian_learning4} 
 %          --------   Bayesain Learning 4  -----------
 \begin{figure}[htbp] 
 	\centering
-	\includegraphics[width=0.9\textwidth]{pics/bayesian_learning_4}
+	\includegraphics[width=0.7\textwidth]{pics/bayesian_learning_4}
 	\caption{Bayes classification} 
 	\label{bayesian_learning4}
 \end{figure}
@@ -1984,7 +2070,138 @@ We will review a few clustering methods - starting from the simple one, than the
 
 Good properties of a clustering scheme are (i) richness (i.e. every partition should be possible), (ii) scale invariance (i.e. not sensitive to changes in the units of distance measurement) and (iii) consistency (i.e.by reducing distances within the clusters and enlarging between the clusters then we still have the same clustering).
 However, you cannot have all the three properties in a clustering algorithm since they are contradictory (Impossibility Theorem of Kleinberg). You can get two of those.
- 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Principal Component Analysis}
+Principal Component Analysis (PCA) is an \textbf{unsupervised} learning algorithm (like K-Means Clustering). In short, PCA is a transformation of data (feature transformation) in attempts to find out which features explain the most variance in the data (graphically find the new axes). 
+
+PCA helps us to identify patterns in data based on the correlation between features. In a nutshell, PCA aims to find the directions of maximum variance  (i.e. the \textbf{orthogonal} axes of the new subspace: principal components) in high-dimensional data (e.g. original dimensionality: $d$) and projects it onto a new subspace with fewer dimensions than the original one (new dimensionality: $k$, which is $<d$). Algo steps (from scratch):
+\begin{itemize}
+	\item Standardize the d-dimensional dataset;
+	\item Construct the covariance matrix;
+	\item Decompose the covariance matrix into its eigenvectors and eigenvalues;   
+	\item Sort the (abs of) eigenvalues by decreasing order and select the corresponding $k$ (largest) eigenvectors;
+	\item Construct a projection matrix $W$ from the "top" $k$ eigenvectors;
+	\item Transform the $d$-dimensional input dataset $x$ using the projection matrix W to obtain the new (smaller) $k$-dimensional feature subspace.
+\end{itemize}
+
+\begin{lstlisting}
+from sklearn.model_selection import train_test_split
+X, y = df_wine.iloc[:, 1:].values, df_wine.iloc[:, 0].values
+X_train, X_test, y_train, y_test = \
+train_test_split(X, y, test_size=0.3, 
+stratify=y, random_state=0)
+
+# NB: if necessary: (i) normalise data first (i.e. log-transform)
+#                  (ii) remove any outliers 
+#     then		
+# standardize the features
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+X_train_std = sc.fit_transform(X_train)
+X_test_std = sc.transform(X_test)
+
+import numpy as np
+cov_mat = np.cov(X_train_std.T)
+eigen_vals, eigen_vecs = np.linalg.eig(cov_mat)
+
+# explained variance ratios
+tot = sum(eigen_vals)
+var_exp = [(i / tot) for i in
+sorted(eigen_vals, reverse=True)]
+cum_var_exp = np.cumsum(var_exp)
+# ... etc ... 
+
+# Make list of (eigenvalue, eigenvector) tuples and sort
+eigen_pairs = [( np.abs(eigen_vals[i]), eigen_vecs[:, i] )
+for i in range(len(eigen_vals))]
+eigen_pairs.sort(key=lambda k: k[0], reverse=True)
+
+# NB: [:, np.newaxis] make it a column vector
+# and concatenate 
+w = np.hstack((eigen_pairs[0][1][:, np.newaxis],
+eigen_pairs[1][1][:, np.newaxis]))
+
+# transform training dataset
+X_train_pca = X_train_std.dot(w)  # = x W
+
+\end{lstlisting}
+
+By using sklearn we only need to perform the first step above (log-transform and removing outliers if necessary,  then standardise) - all other ones are hidden behind the $PCA()$ algo:
+\begin{lstlisting}
+# 1. Get the data
+from sklearn.datasets import load_breast_cancer
+cancer = load_breast_cancer()
+cancer.keys()  # dict_keys(['DESCR', 'data', 
+# 'feature_names', 'target_names', 'target'])
+print(cancer['DESCR'])
+df = pd.DataFrame(cancer['data'],columns=cancer['feature_names'])
+
+# 2. PCA Visuation (but first scale data)
+# NB: you should really fit scaler on training (good) data only
+#     and then transform both (bad) training and test data as above
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler() 
+scaler.fit(df)
+scaled_data = scaler.transform(df)
+
+from sklearn.decomposition import PCA  # NB: .[family]
+pca = PCA(n_components=2)  # instantiate
+# NB: n_components=None  -> all components
+pca.fit(scaled_data)  # find the components (fitting)
+x_pca = pca.transform(scaled_data)  # rotation and dim reduction
+
+# explained variance ratio (eigenvalues as %)
+print(pca.explained_variance_ratio_)
+
+# components (vectors)
+first_pc = pca.components_[0]
+second_pc = pca.components_[1]
+
+scaled_data.shape  # e.g. (569, 30) vs. below
+x_pca.shape  # (569, 2)  
+
+plt.figure(figsize=(8,6))
+plt.scatter(x_pca[:,0],x_pca[:,1], c=cancer['target'], cmap='plasma')
+plt.xlabel('First principal component')
+plt.ylabel('Second Principal Component')
+
+# components stored as attributes
+pca.components_
+
+# each row in the matrix array above is a princ. component
+# and each column related to orginal features
+# We can visualize such relationship with a heatmap:
+df_comp = pd.DataFrame(pca.components_,columns=cancer['feature_names'])
+plt.figure(figsize=(12,6))
+sns.heatmap(df_comp,cmap='plasma')
+# color bar represents corr(feature, principal)
+\end{lstlisting}
+NB: the values for the first, say, two dimensions remains unchanged when compared to a PCA transformation in, say, six dimensions.
+
+When to use PCA: (i) latent features driving the data patterns, (ii) dimensionality reductions (visualise high-dimension data, or reduce noise, or make other algo work better with fewer features). E.g. eigenfaces: recognise facial pics (having lots of pixels) using fewer points (since general common features: darkness, average face, etc.).
+
+Unfortunately, with this great power of dimensionality reduction, comes the cost of being able to easily understand what these components represent (\textit{loss of interpretability}). The components correspond to combinations of the original features, the components themselves are stored as an attribute of the fitted PCA object.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Independent Component Analysis}
+Whilst PCA finds correlations by maximising variance, Independent Component Analysis (ICA) is a linear transformation where (i) new features (components) are independent (and non-gaussian) and (ii) mutual information between new and original features is as high as possible. 
+
+The blind source separation (or the cocktail party) problem: whilst recording simultaneous conversations in a party, we need to separate or focus on one particular person (people are the hidden variables, observables are the microphones but each has a different linear combinations of these persons' voices). This signal separation problem is the one that ICA is really good at solving. 
+
+ICA is motivated by the idea that when you add things up, you get something normal, due to the central limit theorem, and really hopes that the data are non-normal, so that the non-normal components can be extracted from them. To exploit non-normality, ICA tries to maximize the fourth moment (Kurtosis) of a linear combination of the inputs (all considered equally relevant vs. PCA that ordered them). PCA, instead, maximizes the second moment (variance) of a standardized combination of inputs (getting mutually orthogonal features, and ordered features). Whilst eigenfaces (PCA applied to face recognition) finds brightness and average face as first two components (and works for reconstruction), ICA finds different components like nose, smile, hair, chin on bottom (and hence finds 'parts of'); for forests PCA finds something similar (brightness, ...), ICA finds edges; hence useful for finding documents topics.
+
+More on this long \href{https://www.cs.helsinki.fi/u/ahyvarin/papers/NN00new.pdf}{paper}.
+
+An alternative to PCA and ICA is \textbf{Random Component Analysis} (RCA): generates random directions and it works really well if, afterwards, our purpose is to run a classification (because reduce dimensionality). The big advantage (vs. PCA/ICA) is that is fast.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear Discriminant Analysis}
+Whereas PCA attempts to find the orthogonal component axes of maximum variance in a dataset, the goal in LDA is to find the feature subspace that optimises class separability (discriminates based on the label).
+
+Both PCA and LDA are linear transformation techniques that can be used to reduce the number of dimensions in a dataset; the former is an unsupervised algorithm, whereas the latter is supervised.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 \subsection{Single Linkage Clustering}
 Running time of SLC is $o(n^3)$for $n$ points and $K$ clusters (worst case is that $k$ is $1/2$ hence to look at all distances to find closest takes $o(n^2)$ to look at have different labels, we do this $n$ timesmn)
 
@@ -1997,7 +2214,7 @@ Running time of SLC is $o(n^3)$for $n$ points and $K$ clusters (worst case is th
 \end{figure}
 %         --------------------------------------
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{K Means Clustering}
 K Means Clustering is an \textbf{unsupervised} learning algorithm that will attempt to group similar elements (PCA instead is a factor based rather than clustering algo). Used for market segmentation, cluster customers based on features, identify similar groups, ...
 
@@ -2063,60 +2280,69 @@ ax2.set_title("Original")
 ax2.scatter(data[0][:,0],data[0][:,1],c=data[1],cmap='rainbow')
 \end{lstlisting}
 
-\subsection{DBSCAN}
-
-\subsection{Soft}
-E.g. Expectation Maximisation 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Principal Component Analysis}
-Principal Component Analysis (PCA) is an \textbf{unsupervised} learning algorithm (like K-Means Clustering).
-
-In short, PCA is a transformation of data in attempts to find out what features explain the most variance in the data.
-
-It is difficult to visualize high dimensional data, we can use PCA to find the first two principal components, and visualize the data in this new, two-dimensional space, with a single scatter-plot. Before we do this though, we'll need to scale our data so that each feature has a single unit variance (see scaler() below, in 2. PCA Visualition, or K-Nearest Neighbours \ref{K_Nearest_Neighbours}).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gaussian Mixture Model}
+E.g. Expectation maximization (EM) is a numerical technique for maximum likelihood estimation, and is usually used when closed form expressions for updating the model parameters can be calculated (which will be shown below). \href{http://home.deib.polimi.it/matteucc/Clustering/tutorial_html/mixture.html}{Expectation maximization} is an iterative algorithm and has the convenient property that the maximum likelihood of the data strictly increases with each subsequent iteration, meaning it is guaranteed to approach a local maximum or saddle point \\
+Gaussian Mixture Model ('GMM') is a soft/probabilistic clustering algorithm, which means that - contrary to K-Means where every datapoint must belong to a cluster - GMM assigns a probability to a point belonging to a specific cluster and revising such probability at each iteration. In other words, GMM is a generalisation of KM that incorporates the data covariance structure and centers of latent Gaussians. More on \href{http://scikit-learn.org/stable/modules/mixture.html#expectation-maximization}{sklearn on GMM}.
 
 \begin{lstlisting}
-# 1. Get the data
-from sklearn.datasets import load_breast_cancer
-cancer = load_breast_cancer()
-cancer.keys()  # dict_keys(['DESCR', 'data', 
-# 'feature_names', 'target_names', 'target'])
-print(cancer['DESCR'])
-df = pd.DataFrame(cancer['data'],columns=cancer['feature_names'])
+from sklearn.mixture import GaussianMixture
+from sklearn.metrics import silhouette_score
+num_clusters = [i for i in range(2, 10)] + [20, 50] 
 
-# 2. PCA Visuation (but first scale data)
-from sklearn.preprocessing import StandardScaler
-scaler = StandardScaler() 
-scaler.fit(df)
-scaled_data = scaler.transform(df)
-
-from sklearn.decomposition import PCA  # NB: .[family]
-pca = PCA(n_components=2)  # instantiate
-pca.fit(scaled_data)  # find the components (fittinh)
-x_pca = pca.transform(scaled_data)  # rotation and dim reduction
-
-scaled_data.shape  # e.g. (569, 30) vs. below
-x_pca.shape  # (569, 2)  
-
-plt.figure(figsize=(8,6))
-plt.scatter(x_pca[:,0],x_pca[:,1],c=cancer['target'],cmap='plasma')
-plt.xlabel('First principal component')
-plt.ylabel('Second Principal Component')
-
-# components stored as attributes
-pca.components_
-
-# each row in the matrix array above is a princ. component
-# and each column related to orginal features
-# We can visualize such relationship with a heatmap:
-df_comp = pd.DataFrame(pca.components_,columns=cancer['feature_names'])
-plt.figure(figsize=(12,6))
-sns.heatmap(df_comp,cmap='plasma')
-# color bar represents corr(feature, principal)
+for _n in num_clusters:
+	clusterer = GaussianMixture(n_components=_n).fit(reduced_data)
+	preds = clusterer.predict(reduced_data)
+	# # before we ran
+	# pca = PCA(n_components=2).fit(good_data)
+	# reduced_data = pca.transform(good_data)
+	centers = clusterer.means_
+	score = silhouette_score(reduced_data, preds)
+	print("{} clusters has a {} score silhouette" .format(_n, score)) 
 \end{lstlisting}
+Silhouette analysis can be used to check how \textit{balanced} are the clusters obtained from different values of number of clusters. Remark that in certain cases, you can even choose a value for number of clusters which gives a sub-optimal score. For example, in this \href{http://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_silhouette_analysis.html#sphx-glr-auto-examples-cluster-plot-kmeans-silhouette-analysis-py}{link}, 2 is not considered optimal, despite having a better Silhouette score, because it doesn't result in balanced clusters, while 4 does.
+ 
+Since the data ($reduced_data$) is currently reduced in dimension ($pca.transform()$) and scaled by a logarithm, we can recover the representative customer spending from these data points by applying the inverse transformations.	
+\begin{lstlisting}
+# Inverse transform the centers
+log_centers = pca.inverse_transform(centers)
 
-Unfortunately, with this great power of dimensionality reduction, comes the cost of being able to easily understand what these components represent. The components correspond to combinations of the original features, the components themselves are stored as an attribute of the fitted PCA object.
+# Exponentiate the centers
+true_centers = np.exp(log_centers)
+
+segments = ['Segment {}'.format(i) for i in range(0,len(centers))]
+true_centers = pd.DataFrame(np.round(true_centers), columns = data.keys())
+true_centers.index = segments
+\end{lstlisting}
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{DBSCAN}
+Its parameters are (i) the distance (epsilon) and (ii) min number of points to get a cluster (vs. num. of clusters for K-means). In short, DBSCAN selects a data point and check if within its specified distance there are a min number of points (e.g. 5), if so it defines a cluster (and check again for each point inside and individuate 'border' points of the cluster); if a selected point does not contain the 5 points in the distance neighbour is defined as a 'noise point'. 
+
+See visual comparison in fig. \ref{_dbscan}.
+
+%          --------   FIGURE: DBSCAN  -----------
+\begin{figure}[htbp] 
+	\centering
+	\includegraphics[width=0.7\textwidth]{pics/dbscan}
+	\caption{Density-based Clustering vs. K-means} 
+	\label{_dbscan}
+\end{figure}
+%         --------------------------------------
+
+\begin{lstlisting}
+# 1. get/create data
+from sklearn.datasets import load_iris
+# Create Data
+data = load_iris().data
+
+# create the cluster
+from sklearn.cluster import DBSCAN
+db_scan = DBSCAN(eps=0.5, min_samples=5) # 2 params
+db_scan.fit(data)
+
+db_scan.labels_  # the labels (-1: noise)
+\end{lstlisting}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

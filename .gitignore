@@ -73,3 +73,6 @@ target/
 private/
 Data/
 Chapter*
+
+# for the notebooks - to be removed?
+#notebooks/
